@@ -1,0 +1,24 @@
+{
+  "name": "idahub",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
+    "start": "nodemon --exec 'npm run build && node ./dist/bin/www'"
+  },
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "jade": "~1.11.0",
+    "mongoose": "^5.5.3",
+    "morgan": "~1.9.0",
+    "rimraf": "^2.6.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
+  }
+}
