@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
-    "start": "nodemon --exec 'npm run build && node ./dist/bin/www'"
+    "start": "DEBUG=idahub:server nodemon --exec 'npm run build && node ./dist/bin/www'"
   },
   "dependencies": {
     "babel-cli": "^6.26.0",
