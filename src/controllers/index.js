@@ -13,6 +13,6 @@ router.get('/', function(req, res, next) {
 });
 
 /* User apis */
-router.post("/api/users/new", NewUser);
+router.post("/api/users/new", NewUser.validators, NewUser.handler);
 
 module.exports = router;
