@@ -8,8 +8,8 @@ export const Models = {
     User: {
         name: "User"
     },
-    UsersInProjects: {
-        name: "UsersInProject"
+    UserInProject: {
+        name: "UserInProject"
     },
 
 }

@@ -1,6 +1,6 @@
 // Handling path /api/users/new
 
-import User from "../../models/users/index";
+import { User } from "../../models/index";
 import { createUserDetails, sendJSONResponse, generateValidatorErrorsArray } from "../../utils/utils";
 import passwordHash from "password-hash";
 import { check, validationResult } from 'express-validator/check';
