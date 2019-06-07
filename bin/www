@@ -7,6 +7,7 @@
 var app = require('../src/app');
 var debug = require('debug')('idahub:server');
 var http = require('http');
+var mongoose = require('mongoose');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,11 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+/**
+ * Connect to the mongo server
+ */
+mongoose.connect("mongodb://localhost/idahub");
 
 /**
  * Listen on provided port, on all network interfaces.
