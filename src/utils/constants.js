@@ -10,8 +10,7 @@ export const Models = {
     },
     UserInProject: {
         name: "UserInProject"
-    },
-
+    }
 }
 
 export const Protocol = {
@@ -21,3 +20,6 @@ export const Protocol = {
         FailureStatusCode: 500
     }
 }
+
+// For pagination
+export const ResultsPageSize = 10; 

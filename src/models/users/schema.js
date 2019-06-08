@@ -3,6 +3,7 @@
  */
 
 import passwordHash from "password-hash";
+import mongoosePaginate from "mongoose-paginate";
 import { Schema } from "mongoose";
 import { Models } from "../../utils/constants";
 
@@ -30,5 +31,9 @@ const UserSchema = Schema({
         maxlength: 32
     }
 });
+
+// Add pagination plugin
+UserSchema.plugin(mongoosePaginate);
+
 
 export default UserSchema;
