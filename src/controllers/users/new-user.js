@@ -24,17 +24,26 @@ const handler = (req, res) => {
     newUser.password = passwordHash.generate(postedPassword, { algorithm: 'sha256' });
     newUser.email = req.body.email;
 
-    newUser.save((err, savedUser) => {
-        if(err) {
+    // Check if user doesn't exist, and create if not.
+    User.find({ username: newUser.username }, (err, foundDocs) => {
+        if(err)
             sendJSONResponse(res, err, false);
-            return;
-        }
-
-        const responseBody = createUserDetails(
-            savedUser.username,
-            savedUser._id
-        );
-        sendJSONResponse(res, responseBody, true);
+        else if(foundDocs.length > 0)
+            sendJSONResponse(res, "User with name " + newUser.username + " already exists.");
+        else
+            // No such user exists, create
+            newUser.save((err, savedUser) => {
+                if(err) {
+                    sendJSONResponse(res, err, false);
+                    return;
+                }
+        
+                const responseBody = createUserDetails(
+                    savedUser.username,
+                    savedUser._id
+                );
+                sendJSONResponse(res, responseBody, true);
+            });
     });
 };
 
