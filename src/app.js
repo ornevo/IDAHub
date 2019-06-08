@@ -4,9 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
 
-var indexRouter = require('./controllers/index');
+import indexRouter from './controllers/index';
 
 var app = express();
 

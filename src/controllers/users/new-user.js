@@ -1,9 +1,9 @@
 // Handling path /api/users/new
 
 import { User } from "../../models/index";
-import { createUserDetails, sendJSONResponse, generateValidatorErrorsArray } from "../../utils/utils";
+import { createUserDetails, sendJSONResponse } from "../../utils/utils";
 import passwordHash from "password-hash";
-import { check, validationResult } from 'express-validator/check';
+import { check } from 'express-validator/check';
 
 
 // Some input controll validators
@@ -15,12 +15,6 @@ const validators = [
 
 // Handler, the route function
 const handler = (req, res) => {
-    const errors = validationResult(req).array();
-    if(errors.length > 0) {
-        sendJSONResponse(res, generateValidatorErrorsArray(errors), false);
-        return;
-    }
-
     let newUser = new User();
 
     newUser.username = req.body.username;

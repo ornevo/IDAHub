@@ -1,18 +1,37 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
+
+// import middleware
+import { handleExpressValidatorErrorsMiddleware } from "./middleware";
 
 // import handlers
 import NewUser from "./users/new-user"; 
 
 
+/*
+ * routerFunction could be `router.get/post`
+ * route is the string of the route, e.g. "/api/users/new"
+ * exportedRoute is `import "./users/new-user"`
+**/
+function defineRoute(routerFunction, route, exportedRoute) {
+  routerFunction(
+    route,
+    exportedRoute.validators,
+    handleExpressValidatorErrorsMiddleware,
+    exportedRoute.handler
+  );
+}
+
+
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   res.json({
     "Message": 'welcome!'
-  })
+  });
 });
 
 /* User apis */
-router.post("/api/users/new", NewUser.validators, NewUser.handler);
+defineRoute(router.post.bind(router), "/api/users/new", NewUser);
 
-module.exports = router;
+
+export default router;
