@@ -19,7 +19,8 @@ export const Protocol = {
         Failure: "Failed",
         FailureStatusCode: 500,
         UnauthorizedStatusCode: 401
-    }
+    },
+    httpAuthorizationScheme: "Bearer",
 }
 
 // Some JWT settings
