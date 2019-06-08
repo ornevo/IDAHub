@@ -29,7 +29,7 @@ const handler = (req, res) => {
         if(err)
             sendJSONResponse(res, err, false);
         else if(foundDocs.length > 0)
-            sendJSONResponse(res, "User with name " + newUser.username + " already exists.");
+            sendJSONResponse(res, "User with name " + newUser.username + " already exists.", false);
         else
             // No such user exists, create
             newUser.save((err, savedUser) => {
