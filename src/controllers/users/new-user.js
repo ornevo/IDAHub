@@ -3,14 +3,14 @@
 import { User } from "../../models/index";
 import { createUserDetails, sendJSONResponse } from "../../utils/utils";
 import passwordHash from "password-hash";
-import { check } from 'express-validator/check';
+import { body } from 'express-validator/check';
 
 
 // Some input controll validators
 const validators = [
-    check("username").isAlphanumeric().isLength({ max: 50 }),
-    check("password").isAlphanumeric(),
-    check("email").isEmail()
+    body("username").isAlphanumeric().isLength({ max: 50 }),
+    body("password").isAlphanumeric(),
+    body("email").isEmail()
 ]
 
 // Handler, the route function
