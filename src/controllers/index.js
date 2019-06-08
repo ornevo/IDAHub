@@ -7,6 +7,7 @@ import { handleExpressValidatorErrorsMiddleware } from "./middleware";
 // import handlers
 import NewUser from "./users/new-user"; 
 import SearchUser from "./users/search-users"; 
+import GetUserToken from "./users/get-token";
 
 
 /*
@@ -33,6 +34,7 @@ router.get('/', function(req, res) {
 
 /* User apis */
 defineRoute(router.post.bind(router), "/api/users/new", NewUser);
+defineRoute(router.get.bind(router), "/api/users/token", GetUserToken);
 defineRoute(router.get.bind(router), "/api/users", SearchUser);
 
 export default router;
