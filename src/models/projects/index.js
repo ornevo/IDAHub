@@ -1,3 +1,3 @@
-import { Project } from "./model";
+import Project from "./model";
 
 export default Project;

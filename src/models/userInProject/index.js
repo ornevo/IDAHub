@@ -1,3 +1,3 @@
-import { UserInProject } from "./model";
+import UserInProject from "./model";
 
 export default UserInProject;
