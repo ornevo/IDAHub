@@ -16,7 +16,7 @@ const ProjectSchema = Schema({
         type: String,
         maxlength: 10000
     },
-    // MD5 Hash of the reversed file
+    // MD5 Hash of the reversed file, as hex digest
     hash: {
         type: String,
         required: true,
@@ -27,6 +27,11 @@ const ProjectSchema = Schema({
         type: Schema.Types.ObjectId,
         ref: Models.User.name,
         required: true
+    },
+    public: {
+        type: Schema.Types.Boolean,
+        required: true,
+        default: true
     }
 });
 
