@@ -18,7 +18,8 @@ export const Protocol = {
         Success: "OK",
         Failure: "Failed",
         FailureStatusCode: 500,
-        UnauthorizedStatusCode: 401
+        UnauthorizedStatusCode: 401,
+        NotFoundStatusCode: 404
     },
     httpAuthorizationScheme: "Bearer",
 }

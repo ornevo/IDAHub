@@ -2,11 +2,13 @@ import { sendJSONResponse, generateValidatorErrorsArray } from "../utils/utils";
 import { Protocol } from "../utils/constants";
 import { validationResult } from 'express-validator/check';
 import { verifyJWTToken } from '../utils/jwt';
+import { Project } from "../models";
+import mongoose from 'mongoose';
 
 
 // Checks if some errors occurred during params validation, and returns
 //  an error response if some did.
-export const handleExpressValidatorErrorsMiddleware = (req, res, next) => {
+export const handleExpressValidatorErrorsMiddleware = (req, res, next) => {    
     const errors = validationResult(req).array();
     if(errors.length > 0) {
         sendJSONResponse(res, generateValidatorErrorsArray(errors), false);
@@ -27,6 +29,30 @@ export const defaultParamToMiddleware = (fieldName, reqSubObjectName, defaultVal
         req[reqSubObjectName][fieldName] = req[reqSubObjectName][fieldName] || defaultValue;
         next();
     }
+}
+
+// If projectId is a valid id, adds the project to req.project
+export const validateProjectId = () => function(req, res, next){
+    const projectId = req.params['projectId'];
+    if(typeof projectId !== typeof "" || !mongoose.Types.ObjectId.isValid(projectId)) {
+        sendJSONResponse(res, "projectId is not valid.", false);
+        return;
+    }
+
+    Project.findById(projectId, (err, project) => {
+        if(err) {
+            sendJSONResponse(res, err, false);
+            return;
+        }
+        // If not found
+        if(!project._id) {
+            sendJSONResponse(res, "Not found", false, Protocol.Status.NotFoundStatusCode);
+            return;
+        }
+
+        req.project = project;
+        next();
+    });
 }
 
 // Validates the passed JWT, and add the decoded token to req.jwt
