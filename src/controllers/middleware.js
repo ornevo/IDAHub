@@ -30,34 +30,42 @@ export const defaultParamToMiddleware = (fieldName, reqSubObjectName, defaultVal
 }
 
 // Validates the passed JWT, and add the decoded token to req.jwt
+// If requireAuth is true, will return unautherized response if fails
+//  to approve token. if requireAuth is false, will set req.jwt = undefined
+//  and proceed.
 // TBH I wrote it as a function returning the middleware instead of
 //  simply the middleware itself just to keep a convention with the previous
 //  middleware defaultParamToMiddleware
-export const validateAuthToken = () => {
-    function failValidation(res) {
-        sendJSONResponse(res, "Autherization token validation failed.", false, Protocol.Status.UnauthorizedStatusCode);
-        return;
+export const validateAuthToken = (requireAuth = true) => {
+    function failValidation(req, res, next) {
+        if(requireAuth) {
+            sendJSONResponse(res, "Autherization token validation failed.", false, Protocol.Status.UnauthorizedStatusCode);
+            return;
+        } else {
+            req.jwt = undefined;
+            next();
+        }
     }
 
     return function(req, res, next) {
         // Get the http header raw string value 
         let autherizationHeader = String(req.get('authorization'));
         if(!autherizationHeader || autherizationHeader.split(" ").length != 2) {
-            failValidation(res);
+            failValidation(req, res, next);
             return;
         }
         
         // Extract the method and token from it
         const [scheme, token] = autherizationHeader.split(" ");
         if(scheme != Protocol.httpAuthorizationScheme || !token) {
-            failValidation(res);
+            failValidation(req, res, next);
             return;
         }
 
         // Validate the token
         const decodedJWT = verifyJWTToken(token);
         if(!decodedJWT) {
-            failValidation(res);
+            failValidation(req, res, next);
             return;
         }
 
