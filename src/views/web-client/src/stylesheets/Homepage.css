@@ -1,0 +1,35 @@
+.Homepage {
+    text-align: center;
+}
+
+.Homepage-logo {
+    height: 207px;
+    pointer-events: none;
+}
+
+.Homepage-secondary-header, .Homepage-main-header {
+    margin: 10px;
+    font-weight: normal;
+}
+
+.Homepage-main-header {
+    margin-bottom: 0;
+    font-size: 75px;
+}
+
+.Homepage-secondary-header {
+    font-size: calc(10px + 2vmin);
+}
+
+/* Small screen size dependent styling - KEEP AT THE END */
+@media (max-width: 512px) {
+    .Homepage-logo {
+        height: 40vmin;
+    }
+}
+
+@media (max-width: 320px) {
+    .Homepage-main-header {
+        font-size: calc(10px + 20vmin);
+    }
+}
