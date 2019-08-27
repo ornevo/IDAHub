@@ -44,3 +44,14 @@
   color: whitesmoke;
   text-decoration: none;
 }
+
+/* Modal styling */
+.Modal-inner-container {
+  padding: 20px;
+}
+
+.Modal-exit-button {
+  margin: 10px;
+  width: 40px;
+  cursor: pointer;
+}
