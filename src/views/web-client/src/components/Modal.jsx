@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from "prop-types";
 import ReactModal from 'react-modal';
+import { MainColor } from "../shared/Constants";
 import { FaRegTimesCircle } from 'react-icons/fa';
 
 
@@ -50,13 +51,15 @@ class Modal extends React.Component {
             width: this.state.modalWidth,
             padding: 0,
             borderRadius: "40px 40px 0 0",
+            insert: "50% 0 0 0"
         };
         return (
-            <ReactModal style={{overlay: { zIndex: 10000 }, content: modalStyle}} 
-                isOpen={this.props.isOpen} onRequestClose={this.props.onClose}>
+            <ReactModal 
+                style={{overlay: { zIndex: -100 }, content: modalStyle}}
+                isOpen={this.props.isOpen} onRequestClose={this.props.onClose} closeTimeoutMS={250}>
 
                 {/* Exit button */}
-                <FaRegTimesCircle size={32}
+                <FaRegTimesCircle size={32} style={{color: MainColor}}
                     onClick={this.props.onClose} className="Modal-exit-button" />
 
                 <div className="Modal-inner-container">
@@ -72,7 +75,7 @@ class Modal extends React.Component {
 Modal.propTypes = {
     isOpen: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
-    chlidren: PropTypes.element.isRequired
+    children: PropTypes.element.isRequired
 };
 
 Modal.defaultProps = {

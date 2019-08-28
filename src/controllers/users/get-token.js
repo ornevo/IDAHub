@@ -25,7 +25,7 @@ const handler = (req, res) => {
             sendJSONResponse(res, err, false); 
             return;
         } else if(foundDocs.length == 0) {
-            sendJSONResponse(res, "User with name " + username + " does not exists.", false);
+            sendJSONResponse(res, "User with name " + username + " does not exists.", false, Protocol.Status.UnauthorizedStatusCode);
             return;
         }
 

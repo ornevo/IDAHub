@@ -24,7 +24,7 @@
   font-size: calc(10px + 2vmin);
   color: white;
 
-  z-index: 10;
+  z-index: -10000;
 }
 
 /* Menu styling */
@@ -32,7 +32,7 @@
   background: rgb(2,0,36);
   background: linear-gradient(0deg, rgba(2,0,36,0) 0%, rgba(49,57,60,0.3007003484987745) 75%, rgba(49,57,60,0.49887133182844245) 100%);   padding: 15px 0 20px 0;
 
-  z-index: 1000;
+  z-index: -1000;
 }
 
 .Menu-item,
@@ -51,7 +51,33 @@
 }
 
 .Modal-exit-button {
-  margin: 10px;
+  margin: 20px 0 0 20px;
   width: 40px;
   cursor: pointer;
+}
+
+.ReactModal__Content > div {
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
+}
+
+.ReactModal__Content--after-open > div {
+  opacity: 1;
+}
+
+.ReactModal__Content--before-close > div {
+  opacity: 0;
+}
+
+.ReactModal__Overlay {
+  opacity: 0;
+  transition: opacity 250ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open{
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close{
+  opacity: 0;
 }

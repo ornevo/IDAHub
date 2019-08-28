@@ -24,7 +24,6 @@
     "rimraf": "^2.6.3"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
     "eslint-plugin-react": "^7.13.0",
     "nodemon": "^1.18.11"
   }
