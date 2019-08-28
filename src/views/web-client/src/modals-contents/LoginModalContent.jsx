@@ -7,63 +7,52 @@ import { NotificationManager } from "react-notifications";
 
 import 'react-notifications/lib/notifications.css';
 
-import { safeget } from "../shared/Utils"; 
+import { safeget } from "../shared/Utils";
 import { login } from "../shared/API";
+import StatelessFormAPIHandler from "./StatelessFormAPIHandler";
 
 
 class LoginModalContent extends React.Component {
-  constructor(props) {
-    super(props);
+	validateForm(formData) {
+		if (!formData.username || !formData.password) {
+			NotificationManager.error("All fields must be filled");
+			return false;
+		}
+		return true;
+	}
 
-    this.state = {
-      isLoading: false
-    }
-  }
+	onSuccess(body) {
+		if (!body || !body.token) {
+			NotificationManager.error("Failed extracting auth token.");
+			return;
+		}
 
-  onSubmit(data) {
-    if(!data.username || !data.password) {
-      NotificationManager.error("All fields must be filled");
-      return;
-    } 
+		const token = body.token;
+		NotificationManager.success("Success. You are now logged in.");
 
-    this.setState({isLoading: true});
+		this.props.onLogin(token);
+	}
 
-    // Try to login 
-    login(data.username, data.password)
-      .then(resp => {
-        const token = safeget(['data', 'body', 'token'], resp);
-        if(!token)
-          NotificationManager.error("Failed extracting auth token.");
+	onError(statusCode, body) {
+		if (statusCode == HttpStatus.UNAUTHORIZED)
+			NotificationManager.error("Failed to authenticate: " + body);
+		else
+			NotificationManager.error("ERROR: " + body);
+	}
 
-        NotificationManager.success("Success. You are now logged in.");
-        
-        this.props.onLogin(token);
-
-        this.setState({isLoading: false});
-      })
-      .catch(error => {
-        const errorCode = safeget(['response', 'status'], error) || HttpStatus.UNAUTHORIZED;
-        const errorDesc = safeget(['response', 'data', 'body'], error);
-        if(errorCode == HttpStatus.UNAUTHORIZED)
-            NotificationManager.error("Failed to authenticate: " + errorDesc);
-        else
-          NotificationManager.error("ERROR: " + errorCode + ": " + error.response.data);
-
-        this.setState({isLoading: false});
-      });
-  }
-
-  render() {
-    return (
-      <LoginForm isLoading={this.state.isLoading} onSubmit={this.onSubmit.bind(this)} />
-    );
-  }
+	render() {
+		return (
+			<StatelessFormAPIHandler formToRender={LoginForm} apiFunc={login}
+				onError={this.onError.bind(this)} onSuccess={this.onSuccess.bind(this)}
+				validator={this.validateForm} />
+		);
+	}
 }
 
 
 LoginModalContent.propTypes = {
-  // This function will receive the token once authenticated.
-  onLogin: PropTypes.func.isRequired
+	// This function will receive the token once authenticated.
+	onLogin: PropTypes.func.isRequired
 }
 
 

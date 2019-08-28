@@ -6,6 +6,7 @@ import ResponsiveMenu from 'react-responsive-navbar';
 import { CredContext } from "../shared/Contexts";
 
 import LoginModalContent from "../modals-contents/LoginModalContent";
+import SignupModalContent from "../modals-contents/SignupModalContent";
 import Modal from './Modal';
 
 
@@ -13,19 +14,24 @@ class Menu extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loginModalOpen: false
+            loginModalOpen: false,
+            signupModalOpen: false
         }
     }
 
     // We use credentials for the login/logout buttons
     static contextType = CredContext;
 
+    closeModals() {
+        this.setState({
+            loginModalOpen: false,
+            signupModalOpen: false
+         });
+    }
+
     // Called on either login or signup
     onNewAuthToken(newToken) {
-        this.setState({
-            loginModalOpen: false
-        });
-
+        this.closeModals();
         // Propogate up, to set in context
         this.props.setAuthToken(newToken);   
     }
@@ -39,16 +45,23 @@ class Menu extends Component {
                 <Link className="Menu-item" to="#" onClick={_ => this.setState({loginModalOpen: true})}>
                     Login
                 </Link>
-                <Link className="Menu-item" to="#">Signup</Link>
+                <Link className="Menu-item" to="#" onClick={_ => this.setState({signupModalOpen: true})}>
+                    Signup
+                </Link>
             </span>
         );
 
         return (
             <span>
                 {/* First render modals, then menu */}
-                <Modal isOpen={this.state.loginModalOpen} onClose={_ => this.setState({loginModalOpen: false})}>
+                <Modal isOpen={this.state.loginModalOpen} onClose={_ => this.closeModals()}>
                     <LoginModalContent onLogin={this.onNewAuthToken.bind(this)}/>
                 </Modal>
+
+                <Modal isOpen={this.state.signupModalOpen} onClose={_ => this.closeModals()}>
+                    <SignupModalContent onSignup={this.onNewAuthToken.bind(this)}/>
+                </Modal>
+
                 <ResponsiveMenu
                     menuOpenButton={<div >O</div>}
                     menuCloseButton={<div >X</div>}
