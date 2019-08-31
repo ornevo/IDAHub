@@ -14,6 +14,7 @@ import { NotificationContainer } from "react-notifications";
 /* Custom components */
 import Menu from "./components/Menu";
 import HomepageLayout from "./layouts/homepage";
+import NewProjectLayout from "./layouts/NewProject";
 
 /* Styles importing */
 import './stylesheets/App.css';
@@ -42,12 +43,16 @@ class App extends React.Component {
           
           {/* A context to hold authentication token if logged in */}
           <CredContext.Provider value={this.state.authToken}>
-
             <Router>
-              <Menu setAuthToken={this.setAuthToken.bind(this)}/>
-              <Route exact path="/" component={HomepageLayout} />
-            </Router>
 
+              <Menu setAuthToken={this.setAuthToken.bind(this)}/>
+              <div className="Full-screen-container">
+
+                <Route exact path="/" component={HomepageLayout} />
+                <Route exact path="/new-project" component={NewProjectLayout} />
+
+              </div>
+            </Router>
           </CredContext.Provider>
 
           {/* To display notifications */}

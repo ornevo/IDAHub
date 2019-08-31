@@ -7,7 +7,6 @@ import { NotificationManager } from "react-notifications";
 
 import 'react-notifications/lib/notifications.css';
 
-import { safeget } from "../shared/Utils";
 import { signup, login } from "../shared/API";
 import StatelessFormAPIHandler from "./StatelessFormAPIHandler";
 
@@ -44,7 +43,7 @@ class SignupModalContent extends React.Component {
 	}
 
 	onError(statusCode, body) {
-		if (statusCode == HttpStatus.UNAUTHORIZED)
+		if (statusCode === HttpStatus.UNAUTHORIZED)
 			NotificationManager.error("Failed to sign up: " + body);
 		else
 			NotificationManager.error("ERROR: " + body);

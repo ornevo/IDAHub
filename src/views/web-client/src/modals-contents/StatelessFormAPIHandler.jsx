@@ -40,7 +40,7 @@ class StatelessFormAPIHandler extends React.Component {
 
                 this.props.onError(errorCode, errorDesc);
             })
-            .finally((() => this.setState({ isLoading: false })).bind(this));
+            .finally(() => this.setState({ isLoading: false }));
     }
 
     render() {

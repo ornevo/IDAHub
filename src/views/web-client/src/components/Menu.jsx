@@ -71,7 +71,7 @@ class Menu extends Component {
                     menu={
                         <div className="Menu-container">
                             { authField }
-                            <Link to="#" className="Menu-item">Some</Link>
+                            <Link to="/new-project" className="Menu-item">New Project</Link>
                             <Link to="#" className="Menu-item">more</Link>
                             <Link to="#" className="Menu-item">links</Link>
                         </div>
