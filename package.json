@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
-    "start": "DEBUG=idahub:server nodemon --exec 'npm run build && node ./dist/bin/www'"
+    "start": "DEBUG=idahub:server nodemon --ignore 'dist/*' --exec 'npm run build && node ./dist/bin/www'"
   },
   "dependencies": {
     "babel-cli": "^6.26.0",
@@ -24,7 +24,6 @@
     "rimraf": "^2.6.3"
   },
   "devDependencies": {
-    "eslint-plugin-react": "^7.13.0",
-    "nodemon": "^1.18.11"
+    "eslint-plugin-react": "^7.13.0"
   }
 }
