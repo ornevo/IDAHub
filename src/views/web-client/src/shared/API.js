@@ -36,3 +36,9 @@ export const signup = ({username, password, email}) => {
         return respBody;
     });
 }
+
+export const searchUsersByUsername = (username) => {
+    return _wrap_api_promise(
+        axios.get(URL + "/api/users", {params: {name: username}})
+    )
+}
