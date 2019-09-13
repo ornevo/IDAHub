@@ -43,7 +43,7 @@ function renderSuggestion(suggestionProps) {
 
 
 
-class Modal extends React.Component {
+class UserSelector extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -87,7 +87,7 @@ class Modal extends React.Component {
         this.setState({
             currInputValue: '',
             chosenUsers: newChosenUsers
-        });
+        }, () => this.props.onChange(this.state.chosenUsers));
     }
 
     // To simulate delete of a already-selected user
@@ -100,7 +100,7 @@ class Modal extends React.Component {
 
     onDelete(deletedUser) {
         let newChosenUsers = this.state.chosenUsers.filter(user => user.id != deletedUser.id);
-        this.setState({ chosenUsers: newChosenUsers });
+        this.setState({ chosenUsers: newChosenUsers }, () => this.props.onChange(this.state.chosenUsers));
     }
 
     render() {
@@ -172,11 +172,9 @@ class Modal extends React.Component {
 }
 
 
-Modal.propTypes = {
+UserSelector.propTypes = {
+    onChange: PropTypes.func.isRequired
 };
 
-Modal.defaultProps = {
-}
 
-
-export default Modal;
+export default UserSelector;
