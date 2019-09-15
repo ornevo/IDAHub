@@ -37,7 +37,7 @@ const validators = [
     body("project-header").exists(),
     body("project-header.name").isString().isLength({ min: 1, max: 500 }),
     body("project-header.description").isString().isLength({ max: 10000 }),
-    body("project-header.hash").isWhitelisted(HASH_HEX_ALLOWED_CHARS).isLength({ min: 32, max: 32 }),
+    body("project-header.hash").isWhitelisted(HASH_HEX_ALLOWED_CHARS).isLength({ min: 64, max: 64 }),
     body("project-header.public").isBoolean(),
     body("project-header.contributors").custom(customContributorsValidator)
 ]

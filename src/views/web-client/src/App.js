@@ -13,12 +13,14 @@ import { NotificationContainer } from "react-notifications";
 
 /* Custom components */
 import Menu from "./components/Menu";
+
 import HomepageLayout from "./layouts/homepage";
 import NewProjectLayout from "./layouts/NewProject";
 
 /* Styles importing */
 import './stylesheets/App.css';
 import './stylesheets/Homepage.css';
+import './stylesheets/NewProject.css';
 
 
 class App extends React.Component {
@@ -45,7 +47,7 @@ class App extends React.Component {
           <CredContext.Provider value={this.state.authToken}>
             <Router>
 
-              <Menu setAuthToken={this.setAuthToken.bind(this)}/>
+              <Menu setAuthToken={this.setAuthToken.bind(this)}/>              
               <div className="Full-screen-container">
 
                 <Route exact path="/" component={HomepageLayout} />

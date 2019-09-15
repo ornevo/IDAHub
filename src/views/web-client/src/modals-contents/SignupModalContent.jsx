@@ -1,7 +1,7 @@
 /* Don't ask me whats going on in here. I assume no one will ever read or maintain this code. I deeply apologize if this is not the case. */
 import React from 'react';
 import PropTypes from 'prop-types';
-import SignupForm from "../stateless-forms/SignupForm";
+import SignupForm from "../forms/SignupForm";
 import * as HttpStatus from 'http-status-codes'
 import { NotificationManager } from "react-notifications";
 

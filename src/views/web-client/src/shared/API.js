@@ -18,6 +18,12 @@ function _wrap_api_promise(promise) {
         }));
 }
 
+function __auth_key_to_headers(authKey) {
+    return {
+        "Authorization": "Bearer "+  authKey
+    }
+}
+
 // Returns a promise 
 export const login = ({username, password}) => {
     return _wrap_api_promise(
@@ -40,5 +46,21 @@ export const signup = ({username, password, email}) => {
 export const searchUsersByUsername = (username) => {
     return _wrap_api_promise(
         axios.get(URL + "/api/users", {params: {name: username}})
-    )
+    );
+}
+
+export const newProject = (authApiKey, projectName, projectDescription, isPrivate, contributors, reversedFileHash) => {
+    const params = {
+        "project-header": {
+            name: projectName,
+            description: projectDescription,
+            hash: reversedFileHash,
+            contributors,
+            public: !isPrivate
+        }
+    };
+
+    return _wrap_api_promise(
+        axios.post(URL + "/api/projects", params, { headers: __auth_key_to_headers(authApiKey) })
+    );
 }

@@ -16,12 +16,12 @@ const ProjectSchema = Schema({
         type: String,
         maxlength: 10000
     },
-    // MD5 Hash of the reversed file, as hex digest
+    // SHA256 Hash of the reversed file, as hex digest
     hash: {
         type: String,
         required: true,
-        minlength: 32,
-        maxlength: 32
+        minlength: 64,
+        maxlength: 64
     },
     owner: {
         type: Schema.Types.ObjectId,
