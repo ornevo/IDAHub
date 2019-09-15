@@ -2,7 +2,7 @@
 
 /* React imports */
 import React from 'react';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -36,6 +36,15 @@ class App extends React.Component {
     this.setState({authToken: newToken});
   }
 
+  // This returns a component that redirects to '/' if not authenticated, but returns component otherwise
+  __authReqWrapper(component) {
+    return (
+      this.state.authToken !== false ?
+        component :
+        () => <Redirect to="/" />
+    );
+  }
+
   render() {
     return (
       <div className="App">
@@ -51,7 +60,9 @@ class App extends React.Component {
               <div className="Full-screen-container">
 
                 <Route exact path="/" component={HomepageLayout} />
-                <Route exact path="/new-project" component={NewProjectLayout} />
+                <Route exact path="/new-project" component={this.__authReqWrapper(NewProjectLayout)} />
+                {/* A not found route back to main */}
+                <Route path="*" component={() => <Redirect to="/" />} /> 
 
               </div>
             </Router>
