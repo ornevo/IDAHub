@@ -12,6 +12,10 @@ const maxModalWidth = 810;
 const defaultModalFraction = 0.6; 
 
 
+// Needed for accessibility
+ReactModal.setAppElement("#root");
+
+
 class Modal extends React.Component {
     constructor(props) {
         super(props);

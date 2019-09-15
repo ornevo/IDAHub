@@ -1,11 +1,8 @@
 /* A general popup for a consistent look */
 import React from 'react';
 import PropTypes from 'prop-types';
-import deburr from 'lodash/deburr';
 import Downshift from 'downshift';
-import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import Popper from '@material-ui/core/Popper';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -14,7 +11,6 @@ import Chip from '@material-ui/core/Chip';
 import { NotificationManager } from "react-notifications";
 
 import { searchUsersByUsername } from "../shared/API";
-import { thisExpression } from '@babel/types';
 
 
 // Time to wait after finishing to write in order to update users, in ms
@@ -62,11 +58,11 @@ class UserSelector extends React.Component {
         // Only update users after some delay in typing
         setTimeout(() => {
             // Not relevant if text changed
-            if(this.state.currInputValue != newInput)
+            if(this.state.currInputValue !== newInput)
                 return;
 
             searchUsersByUsername(newInput).then(foundUsers => {
-                if(this.state.currInputValue != newInput)
+                if(this.state.currInputValue !== newInput)
                     return;
                 
                 this.setState({fetchedUsers: (foundUsers || {}).data || []})                
@@ -77,11 +73,11 @@ class UserSelector extends React.Component {
     }
 
     onUserChosen(chosenUserId) {
-        const chosenUserObject = this.state.fetchedUsers.find(user => user.id == chosenUserId);
+        const chosenUserObject = this.state.fetchedUsers.find(user => user.id === chosenUserId);
 
         let newChosenUsers = this.state.chosenUsers;
 
-        if (newChosenUsers.find(user => user.id == chosenUserId) === undefined)
+        if (newChosenUsers.find(user => user.id === chosenUserId) === undefined)
             newChosenUsers = [...newChosenUsers, chosenUserObject];
 
         this.setState({
@@ -99,7 +95,7 @@ class UserSelector extends React.Component {
     }
 
     onDelete(deletedUser) {
-        let newChosenUsers = this.state.chosenUsers.filter(user => user.id != deletedUser.id);
+        let newChosenUsers = this.state.chosenUsers.filter(user => user.id !== deletedUser.id);
         this.setState({ chosenUsers: newChosenUsers }, () => this.props.onChange(this.state.chosenUsers));
     }
 
@@ -133,7 +129,7 @@ class UserSelector extends React.Component {
                                                 key={user.id}
                                                 tabIndex={-1}
                                                 label={user.username}
-                                                onDelete={(() => this.onDelete(user)).bind(this)}
+                                                onDelete={(() => this.onDelete(user))}
                                             />
                                         ))
                                     }}
@@ -141,7 +137,7 @@ class UserSelector extends React.Component {
                                     onChange={(event => {
                                         this.onInputChange(event.target.value)
                                         onChange(event);
-                                    }).bind(this)}
+                                    })}
                                     onFocus={onFocus}
                                     {...inputProps}
                                     fullWidth={true}

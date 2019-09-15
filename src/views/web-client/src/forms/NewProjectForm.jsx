@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes, { string } from "prop-types"
+import PropTypes from "prop-types"
 import {
     Container, Button, Switch, FormHelperText,
     Typography, FormLabel, TextField
@@ -62,7 +62,7 @@ class NewProjectForm extends React.Component {
     }
 
     onReversedFileChange(e) {
-        if (e.target.files.length == 0)
+        if (e.target.files.length === 0)
             return;
 
         // Since hash calculation may take some time, display loading symbol

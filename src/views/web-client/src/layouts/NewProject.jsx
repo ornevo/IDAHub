@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { NotificationManager } from "react-notifications";
 import { Types } from "mongoose";
 
@@ -29,6 +29,11 @@ export default class NewProjectLayout extends React.Component {
 
         if(projectDescription.length > 10000) {
             NotificationManager.error("Project description too long, max 10000 characters, though got " + projectDescription.length);
+            return false;
+        }
+
+        if(typeof isPrivate !== 'boolean') {
+            NotificationManager.error("Private/Public value corrupted, something went wrong.");
             return false;
         }
 
