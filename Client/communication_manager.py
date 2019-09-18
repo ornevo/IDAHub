@@ -132,7 +132,6 @@ def pull_from_server(integrator_window_key):
 		print e
 		return -1	
 	data = req.content
-	print data
 	try:
 		data_parsed = json.loads(data)	
 	except ValueError:
@@ -142,6 +141,14 @@ def pull_from_server(integrator_window_key):
 	window_handler_of_integrator = get_window_handler_by_id(integrator_window_key)
 	for symbol in new_symbols:
 		send_data_to_window(window_handler_of_integrator, SEND_DATA_TO_IDA, json.dumps(symbol))
+
+	logged_users = data_parsed["logged-on"]
+	for user in logged_users:
+		send_data_to_window(window_handler_of_integrator, SET_LOGGED_USER, json.dumps(user))
+	logged_off_users = data_parsed["logged-off"]
+	for user in logged_off_users:
+		send_data_to_window(window_handler_of_integrator, SET_LOGGED_OFF_USER, json.dumps(user))
+
 		
 def remove_done_timers():
 	global TIMER_ARRAY

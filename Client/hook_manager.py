@@ -16,7 +16,10 @@ import ida_auto
 import shared
 last_ea = None
 def log(data):
-	print("[IReal] " + data)
+	if shared.LOG:
+		print("[IReal] " + data)
+	else:
+		pass
 
 class CursorChangeHook(ida_kernwin.View_Hooks):
 	def view_loc_changed(self, view, now, was):
@@ -85,7 +88,6 @@ class LiveHook(ida_idp.IDB_Hooks):
 	def set_func_start(self, pfn, new_start):
 		if not shared.PAUSE_HOOK:
 			log("New start: {0}".format(new_start))
-			name = get_func_name(new_start).name
 			pass_to_manager(ChangeFunctionStartEvent(pfn.start_ea, new_start))
 		return ida_idp.IDB_Hooks.set_func_start(self, pfn, int(new_start))
 
@@ -226,7 +228,6 @@ class LiveHook(ida_idp.IDB_Hooks):
 		return ida_idp.IDB_Hooks.make_data(self, ea, flags, tid, len)
 		
 	def auto_empty_finally(self):
-		
 		log("auto finished")
 		shared.PAUSE_HOOK = False
 		return 0
@@ -293,6 +294,7 @@ class hook_manager(idaapi.UI_Hooks, idaapi.plugin_t):
 			self.ui_hook.unhook()
 		if self.idb_hook:
 			self.idp_hook.unhook()
+		self.unhook()
 		
 		
 

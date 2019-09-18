@@ -65,6 +65,7 @@ def create_config_file():
 			f.write(json.dumps({}))
 
 ## need to create general config file, the general config file is holding the Debug key, and the server key and the log key.
+## Return True if file created, and false if not.
 def create_general_config_file():
 	if not os.path.exists(GENERAL_CONFIG_FILE):
 		try:
@@ -73,6 +74,9 @@ def create_general_config_file():
 			pass
 		with open(GENERAL_CONFIG_FILE, 'w') as f:
 			f.write(json.dumps({"log": False, "server": "http://192.168.56.102:3000/"}))
+		return True
+	return False
+
 
 def get_data_from_config_file(config_key):
 	with open(GENERAL_CONFIG_FILE, 'r') as f:
@@ -107,6 +111,8 @@ CHANGE_PROJECT_ID = 1400
 #Data: {"username": <username>, "id": <userid>, "token": <token>}
 CHANGE_USER = 1401
 
+SET_LOGGED_USER = 1402
+SET_LOGGED_OFF_USER = 1403
 ## Events id.
 
 CHANGE_FUNCTION_NAME_ID = 1
@@ -140,3 +146,15 @@ DELETE_ENUM_MEMBER_ID = 26
 ## Settings
 PULLING_TIME = 1
 KEEP_ALIVE_TIME = 0.01
+
+## User colors
+BLACK_COLOR = 0x0F0000
+RED_COLOR = 0x6666FF
+ORANGE_COLOR = 0x6699FF
+YELLOW_COLOR = 0xC0FFFF
+GREEN_COLOR = 0x33FF66
+LTGREEN_COLOR = 0x99FF99
+BLUE_COLOR = 0xFF9999
+PURPLE_COLOR = 0xCC6699
+PINK_COLOR = 0x9966FF
+GREY_COLOR = 0x999999
