@@ -101,6 +101,7 @@ class NewProjectForm extends React.Component {
                         {/* The project name */}
                         <TextField
                             required
+                            autoFocus
                             variant="outlined"
                             margin="normal"
                             id="projectName"
@@ -180,7 +181,6 @@ class NewProjectForm extends React.Component {
                                 name="fileHash"
                                 helperText="Supply the sha256 hash of the reveresed file."
                                 fullWidth
-                                autoFocus
                             />
                         </div>
                     </div>
