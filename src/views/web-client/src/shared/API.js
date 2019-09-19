@@ -64,3 +64,11 @@ export const newProject = (authApiKey, projectName, projectDescription, isPrivat
         axios.post(URL + "/api/projects", params, { headers: __auth_key_to_headers(authApiKey) })
     );
 }
+
+export const getUserProjects = (userId, authApiKey=null) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.get(URL + "/api/users/" + userId + "/projects", { headers })
+    );
+}

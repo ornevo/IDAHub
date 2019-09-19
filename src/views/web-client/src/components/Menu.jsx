@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import ResponsiveMenu from 'react-responsive-navbar';
+import JWT from "jsonwebtoken";
 
 import { CredContext } from "../shared/Contexts";
 
@@ -11,16 +12,17 @@ import Modal from './Modal';
 
 
 class Menu extends Component {
+    // We use credentials for the login/logout buttons
+    static contextType = CredContext;
+
     constructor(props) {
         super(props);
+
         this.state = {
             loginModalOpen: false,
             signupModalOpen: false
         }
     }
-
-    // We use credentials for the login/logout buttons
-    static contextType = CredContext;
 
     closeModals() {
         this.setState({
@@ -32,6 +34,15 @@ class Menu extends Component {
     // Called on either login or signup
     onNewAuthToken(newToken) {
         this.closeModals();
+
+        // Upon user login/signup, redirect to the user's profile page, upon logout redirect to /
+        if(!newToken)
+            this.props.history.push("/");
+        else {
+            const decodedToken = JWT.decode(newToken);
+            this.props.history.push('/profile/' + decodedToken.id + "/" + decodedToken.username);
+        }
+
         // Propogate up, to set in context
         this.props.setAuthToken(newToken);   
     }
@@ -94,4 +105,4 @@ Menu.propTypes = {
 }
 
 
-export default Menu;
+export default withRouter(Menu);

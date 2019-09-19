@@ -16,6 +16,7 @@ import Menu from "./components/Menu";
 
 import HomepageLayout from "./layouts/homepage";
 import NewProjectLayout from "./layouts/NewProject";
+import ProfileLayout from "./layouts/Profile";
 
 /* Styles importing */
 import './stylesheets/App.css';
@@ -60,9 +61,10 @@ class App extends React.Component {
               <div className="Full-screen-container">
 
                 <Route exact path="/" component={HomepageLayout} />
+                <Route exact path="/profile/:userId/:username" component={ProfileLayout} />
                 <Route exact path="/new-project" component={this.__authReqWrapper(NewProjectLayout)} />
                 {/* A not found route back to main */}
-                <Route path="*" component={() => <Redirect to="/" />} /> 
+                {/* <Route path="*" component={() => <Redirect to="/" />} />  */}
 
               </div>
             </Router>

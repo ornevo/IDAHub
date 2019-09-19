@@ -114,13 +114,13 @@ class NewProjectForm extends React.Component {
                         {/* public/private control */}
                         <div className="NewProjectForm-switch-container">
                             <div>
-                                <FormLabel>Private</FormLabel>
+                                <FormLabel>Public</FormLabel>
                                 <Switch
                                     checked={this.state.isPrivate}
                                     onChange={() => { this.setState({ isPrivate: !this.state.isPrivate }) }}
                                     value="checkedC"
                                 />
-                                <FormLabel>Public</FormLabel>
+                                <FormLabel>Private</FormLabel>
                             </div>
                             <FormHelperText style={{ maxWidth: "300px" }}>
                                 <b>Public</b> projects are visible to the world, but only editable by approved members.
