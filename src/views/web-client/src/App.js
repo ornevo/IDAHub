@@ -62,7 +62,11 @@ class App extends React.Component {
               <div className="Full-screen-container">
 
                 <Route exact path="/" component={HomepageLayout} />
-                <Route exact path="/profile/:userId/:username" component={ProfileLayout} />
+                {/* In order to re-render it on route change since key changes, using this hack: */}
+                {/* Check this out: https://stackoverflow.com/a/39150493/3477857 */}
+                <Route exact path="/profile/:userId/:username" component={
+                  (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
+                />
                 <Route exact path="/new-project" component={this.__authReqWrapper(NewProjectLayout)} />
                 {/* A not found route back to main */}
                 {/* <Route path="*" component={() => <Redirect to="/" />} />  */}

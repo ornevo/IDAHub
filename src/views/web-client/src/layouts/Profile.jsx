@@ -40,11 +40,12 @@ export default class ProfileLayout extends React.Component {
             });
     }
 
+    // Check for loggedin/logout changes for re-render
     componentDidUpdate() {
-        // If here, user logged in / logged out. We need to update projects.
         if(this.state.currentContext === this.context)
             return;
         
+        // If here, user logged in / logged out. We need to update projects.
         // If changed user status, reset projects and re-fetch them when reset is done
         this.setState({
             currentContext: this.context,
