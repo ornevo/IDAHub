@@ -62,7 +62,7 @@ const Avatar = ({ username, variant }) => {
 
 Avatar.propTypes = {
     username: PropTypes.string.isRequired,
-    variant: PropTypes.oneOf("menu", "chip")
+    variant: PropTypes.oneOf(["menu", "chip"])
 }
 
 Avatar.defaultProps = {

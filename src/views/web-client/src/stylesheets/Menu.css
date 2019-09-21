@@ -33,7 +33,7 @@
     grid-template-columns: auto 1fr auto auto;
 }
 
-.Menu-container-regular > * {
+.Menu-container > * {
     display: grid;
     align-content: center;
 }

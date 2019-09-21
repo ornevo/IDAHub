@@ -37,10 +37,12 @@ class Menu extends Component {
     onNewAuthToken(newToken) {
         this.closeModals();
 
-        // Upon user login/signup, redirect to the user's profile page, upon logout redirect to /
-        if(!newToken)
+        // Upon user login/signup:
+        //  1. Set auth token as cookie
+        //  2. redirect to the user's profile page, upon logout redirect to /
+        if(!newToken) {
             this.props.history.push("/");
-        else {
+        } else {
             const decodedToken = JWT.decode(newToken);
             this.props.history.push('/profile/' + decodedToken.id + "/" + decodedToken.username);
         }
@@ -68,18 +70,18 @@ class Menu extends Component {
 
         // Either login/signup buttons, or a logout links
         const accountLinksWhenLoggedIn = [
-            (<Link className={ menuItemsClass } to="#" onClick={() => { this.onNewAuthToken(false); }}>Sign out</Link>),
-            (<Link to={"/profile/" + userId + "/" + username}> <Avatar variant="menu" username={ username } /> </Link> )
+            (<Link className={ menuItemsClass } to="#" key="LoggedoutMenuItem-1" onClick={() => { this.onNewAuthToken(false); }}>Sign out</Link>),
+            (<Link to={"/profile/" + userId + "/" + username} key="LoggedoutMenuItem-2"> <Avatar variant="menu" username={ username } /> </Link> )
         ];
         const accountLinksWhenLoggedOut = [
-            (<Link className={ menuItemsClass } to="#" onClick={_ => this.setState({loginModalOpen: true})}> Login </Link>),
-            (<Link className={ menuItemsClass } to="#" onClick={_ => this.setState({signupModalOpen: true})}> Signup </Link>)
+            (<Link className={ menuItemsClass } to="#" key="LoggedInMenuItem-1" onClick={_ => this.setState({loginModalOpen: true})}> Login </Link>),
+            (<Link className={ menuItemsClass } to="#" key="LoggedInMenuItem-2" onClick={_ => this.setState({signupModalOpen: true})}> Signup </Link>)
         ]
         const accountLinks = this.context ? accountLinksWhenLoggedIn : accountLinksWhenLoggedOut;
 
         // other login-dependent links
         const loginDependentLinks = [
-            (<Link to="/new-project" className={ menuItemsClass }> New Project </Link>)
+            (<Link to="/new-project" className={ menuItemsClass } key="NewProjectMenuItem"> New Project </Link>)
         ]
         
         return (
@@ -103,7 +105,7 @@ class Menu extends Component {
                         <div className={bgClass}>
                             <Container className={containerClass}>
                                 {/* For each login-dependent link, render place holder if shouldn't appear */}
-                                { loginDependentLinks.map(link => this.context ? link : <div></div> ) }
+                                { loginDependentLinks.map((link, i) => this.context ? link : <div key={"LoginDependantItemPH-" + i}></div> ) }
 
                                 {/* Empty 1fr space in the middle placeholder */}
                                 <div></div>
