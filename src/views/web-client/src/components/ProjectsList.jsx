@@ -12,6 +12,9 @@ const boolToIsPublicString = b => b ? "Public" : "Private";
 
 
 function ProjectsList(props) {
+    if(props.projects.length == 0)
+        return <Typography variant="subtitle1">No Projects</Typography>
+
     return (
         <div className="ProjectsListContainer">
             {props.projects.map(project => (
