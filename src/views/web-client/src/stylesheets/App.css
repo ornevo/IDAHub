@@ -9,32 +9,12 @@
   text-align: center;
 }
 
-.Full-screen-container, .Menu-container {
+.Full-screen-container {
   position: absolute;
   width: 100%;
   top: 0;
   left: 0;
 }
-
-
-/* Menu styling */
-.Menu-container {
-  background: rgb(2,0,36);
-  background: linear-gradient(0deg, rgba(2,0,36,0) 0%, rgba(49,57,60,0.3007003484987745) 75%, rgba(49,57,60,0.49887133182844245) 100%);   padding: 15px 0 20px 0;
-
-  z-index: -1000;
-}
-
-.Menu-item,
-.Menu-item:link,
-.Menu-item:visited,
-.Menu-item:hover,
-.Menu-item:active {
-  margin: 0 30px;
-  color: whitesmoke;
-  text-decoration: none;
-}
-
 
 /* Containers */
 .Full-screen-container {

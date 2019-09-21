@@ -20,6 +20,7 @@ import ProfileLayout from "./layouts/Profile";
 
 /* Styles importing */
 import './stylesheets/App.css';
+import './stylesheets/Menu.css';
 import './stylesheets/Homepage.css';
 import './stylesheets/NewProject.css';
 

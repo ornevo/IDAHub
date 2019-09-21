@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link, withRouter } from "react-router-dom";
 import ResponsiveMenu from 'react-responsive-navbar';
+import Container from '@material-ui/core/Container';
 import JWT from "jsonwebtoken";
 
 import { CredContext } from "../shared/Contexts";
@@ -9,6 +10,7 @@ import { CredContext } from "../shared/Contexts";
 import LoginModalContent from "../modals-contents/LoginModalContent";
 import SignupModalContent from "../modals-contents/SignupModalContent";
 import Modal from './Modal';
+import Avatar from "../components/Avatar";
 
 
 class Menu extends Component {
@@ -48,20 +50,38 @@ class Menu extends Component {
     }
 
     render() {
-        // Either login/signup buttons, or a logout message
-        const authField = this.context ? (
-            <Link className="Menu-item" to="#" onClick={() => { this.onNewAuthToken(false); }}>Sign out</Link>
-        ) : (
-            <span>
-                <Link className="Menu-item" to="#" onClick={_ => this.setState({loginModalOpen: true})}>
-                    Login
-                </Link>
-                <Link className="Menu-item" to="#" onClick={_ => this.setState({signupModalOpen: true})}>
-                    Signup
-                </Link>
-            </span>
-        );
+        /* LOGGED IN INFO */
+        const username = this.context ? JWT.decode(this.context).username : "";
+        const userId = this.context ? JWT.decode(this.context).id : "";
 
+        /* CLASSES */
+
+        // String, either "homepage" or "regular". Appended to class names for different styling
+        const mode = this.props.location.pathname === "/" ? "homepage" : "regular";
+        const menuItemsClass = "Menu-item Menu-item-" + mode;
+        // The container, main parent of the links
+        const containerClass = "Menu-container Menu-container-" + mode + (this.context ? " Menu-container-loggedin" : "");
+        // The main div
+        const bgClass = "Menu-bg Menu-bg-" + mode;
+
+        /* LINKS DOM */
+
+        // Either login/signup buttons, or a logout links
+        const accountLinksWhenLoggedIn = [
+            (<Link className={ menuItemsClass } to="#" onClick={() => { this.onNewAuthToken(false); }}>Sign out</Link>),
+            (<Link to={"/profile/" + userId + "/" + username}> <Avatar variant="menu" username={ username } /> </Link> )
+        ];
+        const accountLinksWhenLoggedOut = [
+            (<Link className={ menuItemsClass } to="#" onClick={_ => this.setState({loginModalOpen: true})}> Login </Link>),
+            (<Link className={ menuItemsClass } to="#" onClick={_ => this.setState({signupModalOpen: true})}> Signup </Link>)
+        ]
+        const accountLinks = this.context ? accountLinksWhenLoggedIn : accountLinksWhenLoggedOut;
+
+        // other login-dependent links
+        const loginDependentLinks = [
+            (<Link to="/new-project" className={ menuItemsClass }> New Project </Link>)
+        ]
+        
         return (
             <span>
                 {/* First render modals, then menu */}
@@ -80,16 +100,17 @@ class Menu extends Component {
                     largeMenuClassName="large-menu-classname"
                     smallMenuClassName="small-menu-classname"
                     menu={
-                        <div className="Menu-container">
-                            { authField }
-                            {
-                                // Login-dependent links
-                                this.context && (
-                                    <span>
-                                        <Link to="/new-project" className="Menu-item">New Project</Link>
-                                    </span>
-                                )
-                            }
+                        <div className={bgClass}>
+                            <Container className={containerClass}>
+                                {/* For each login-dependent link, render place holder if shouldn't appear */}
+                                { loginDependentLinks.map(link => this.context ? link : <div></div> ) }
+
+                                {/* Empty 1fr space in the middle placeholder */}
+                                <div></div>
+
+                                {/* Auth fields */}
+                                { accountLinks }
+                            </Container>
                         </div>
                     }
                 />
