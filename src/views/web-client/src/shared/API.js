@@ -73,8 +73,16 @@ export const getUserProjects = (userId, authApiKey=null) => {
     );
 }
 
-export const userSearch = (query) => {
+export const usersSearch = (query) => {
     return _wrap_api_promise(
         axios.get(URL + "/api/users", { params: { name: query } })
+    );
+}
+
+export const projectsSearch = (query, authApiKey=null) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.get(URL + "/api/projects", { params: { query }, headers })
     );
 }

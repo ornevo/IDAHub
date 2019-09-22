@@ -2,9 +2,10 @@ import React from 'react';
 import { NotificationManager } from "react-notifications";
 import { Typography } from '@material-ui/core';
 
+import { safeget } from "../shared/Utils";
 import Page from '../components/Page';
 import { CredContext } from "../shared/Contexts";
-import { userSearch } from "../shared/API";
+import { usersSearch, projectsSearch } from "../shared/API";
 import ProjectsList from '../components/ProjectsList';
 import UsersList from '../components/UsersList';
 import Loader from "../components/Loader";
@@ -29,17 +30,23 @@ class SearchLayout extends React.Component {
 
     // Fetches the projects and puts them in the state
     fetchUserSearchResults() {
-        userSearch(this.query)
+        usersSearch(this.query)
             .then(users => {
                 if(users && users.data && !this.state.hasLoadedUsers)
                     this.setState({foundUsers: users.data, hasLoadedUsers: true})
             }).catch(err => {
-                NotificationManager.error("Failed to search for users: " + err);
+                NotificationManager.error("Failed to search for users");
             });
     }
 
     fetchProjectSearchResults() {
-
+        projectsSearch(this.query, this.context)
+            .then(projects => {
+                if(projects && projects.data && !this.state.hasLoadedProjects)
+                    this.setState({foundProjects: projects.data, hasLoadedProjects: true})
+            }).catch(err => {
+                NotificationManager.error("Failed to search for projects");
+            });
     }
 
     // Check for loggedin/logout changes for re-render
