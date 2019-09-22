@@ -25,9 +25,13 @@ const SearchBar = ({ currentPath }) => {
 
     // On submit, redirect to search page    
     if(pathWhenSubmitted) {
-        if(pathWhenSubmitted === currentPath)
-            return <Redirect to={"/search/" + encodeURIComponent(inputValue)} />;
-        else // If finished redirecting
+        if(pathWhenSubmitted === currentPath) {
+            // Redirect to main page if nothing to search
+            if(!inputValue)
+                return <Redirect to="/" />;
+            else
+                return <Redirect to={"/search/" + encodeURIComponent(inputValue)} />;
+        } else // If finished redirecting
             setPathWhenSubmitted(undefined);
     }
 
