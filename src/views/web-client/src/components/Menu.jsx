@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link, withRouter } from "react-router-dom";
 import ResponsiveMenu from 'react-responsive-navbar';
 import Container from '@material-ui/core/Container';
+import TextField from '@material-ui/core/TextField';
 import JWT from "jsonwebtoken";
 
 import { CredContext } from "../shared/Contexts";
@@ -14,6 +15,7 @@ import Avatar from "../components/Avatar";
 // import logo from '../res/logo-black.png';
 import logoBG from '../res/logo-gradient-start.png';
 import logoFG from '../res/logo-gradient-end.png';
+import SearchBar from './SearchBar';
 
 
 class Menu extends Component {
@@ -120,8 +122,8 @@ class Menu extends Component {
                                 {/* For each login-dependent link, render place holder if shouldn't appear */}
                                 { loginDependentLinks.map((link, i) => this.context ? link : <div key={"LoginDependantItemPH-" + i}></div> ) }
 
-                                {/* Empty 1fr space in the middle placeholder */}
-                                <div></div>
+                                {/* Search bar */}
+                                <SearchBar currentPath={this.props.location.pathname} />
 
                                 {/* Auth fields */}
                                 { accountLinks }

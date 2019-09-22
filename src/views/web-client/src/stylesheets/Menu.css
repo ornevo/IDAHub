@@ -73,7 +73,6 @@
 
 .Menu-logo-container {
     background-image: none; /* will get set in the code */
-    background-repeat: no-repeat;
     height: 30px;
     background-position: center center;
     background-repeat: no-repeat;
@@ -83,4 +82,31 @@
 @keyframes opacityBlink {
     from { opacity: 1; }
     to   { opacity: 0; }
+}
+
+/* Search bar */
+.SearchBar {
+    background-color: rgba(0, 0, 0, 0.07);
+    border-color: rgba(0,0,0,0);
+
+    border: 0;
+    border-radius: 4px;
+    padding: 6px;
+    padding-left: 33px;
+
+    background-image: none; /* Will be placed in react with a search icon */
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: contain;
+
+    transition: background-color 0.3s ease;
+}
+
+.SearchBar:active, .SearchBar:focus {
+    /* background-color: #fafaff; */
+    background-color: rgba(255, 255, 255, 0.75);
+    /* Remove pixels added i nborder from padding */
+    padding: 5px;
+    padding-left: 32px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { GoPerson } from "react-icons/go";
-import MUIAvatar from '@material-ui/core/Avatar';
 
 import PropTypes from "prop-types";
 
