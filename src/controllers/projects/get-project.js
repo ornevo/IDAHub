@@ -12,13 +12,8 @@ const validators = [
 ]
 
 
-const handler = (req, res) => {    
-    // Only proceed if either public project or private and the owner is authenticated
+const handler = (req, res) => {
     // req.project and req.jwt are initialized by the validators
-    if(!req.project.public && (!req.jwt || req.jwt.id != req.project.owner.toString())) {
-        sendJSONResponse(res, "Unautherizated to view project.", false, Protocol.Status.UnauthorizedStatusCode);
-        return;
-    }
 
     // Even though validateProjectId has initialized our req.project, it only initializes
     //  is with the project records in the Project DB itslef, not the full project-header.
@@ -34,8 +29,21 @@ const handler = (req, res) => {
             return;
         }
 
+        const projectHeader = projectHeaderInArr[0];
+        
+        // Only proceed if either public project or private and the authenticated user is either owner or contributor
+        if(!req.project.public) {
+            const authenticatedId = (req.jwt || {}).id; 
+            const isOwner = authenticatedId == req.project.owner.toString();
+            const isContributor = projectHeader.contributors.find(cont => cont.id.toString() === authenticatedId) !== undefined;
 
-        sendJSONResponse(res, projectHeaderInArr, true);
+            if(!authenticatedId || (!isOwner && !isContributor)) {
+                sendJSONResponse(res, "Unautherizated to view project.", false, Protocol.Status.UnauthorizedStatusCode);
+                return;
+            }
+        }
+
+        sendJSONResponse(res, projectHeader, true);
     });
 }
 
