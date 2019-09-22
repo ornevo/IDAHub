@@ -7,6 +7,8 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import Chip from '@material-ui/core/Chip';
+import UserChip from "./UserChip";
+import { Types } from "mongoose";
 
 import { NotificationManager } from "react-notifications";
 
@@ -73,6 +75,9 @@ class UserSelector extends React.Component {
     }
 
     onUserChosen(chosenUserId) {
+        if(!Types.ObjectId.isValid(chosenUserId))
+            return;
+
         const chosenUserObject = this.state.fetchedUsers.find(user => user.id === chosenUserId);
 
         let newChosenUsers = this.state.chosenUsers;
@@ -125,13 +130,9 @@ class UserSelector extends React.Component {
                                 <TextField
                                     InputProps={{
                                         startAdornment: this.state.chosenUsers.map(user => (
-                                            <Chip
-                                                key={user.id}
-                                                tabIndex={-1}
-                                                label={user.username}
-                                                onDelete={(() => this.onDelete(user))}
-                                            />
-                                        ))
+                                            <UserChip id={user.id} key={user.id} username={user.username} clickable={false} onDelete={(() => this.onDelete(user))} />
+                                        )),
+                                        className: "UserSelector-input"
                                     }}
                                     onBlur={onBlur}
                                     onChange={(event => {

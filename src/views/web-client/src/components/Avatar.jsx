@@ -1,6 +1,8 @@
 import React from 'react';
+
 import { GoPerson } from "react-icons/go";
-import { FaCircle } from "react-icons/fa";
+import MUIAvatar from '@material-ui/core/Avatar';
+
 import PropTypes from "prop-types";
 
 
@@ -43,7 +45,8 @@ const Avatar = ({ username, variant }) => {
         display: "inline-block"
     }
 
-    if(variant == "menu") {
+    // For now same style for menu and chip
+    if(variant === "menu" || variant === "chip") {
         containerStyle.width = "30px";
         containerStyle.height = "30px";
         containerStyle.fontSize = "12px";
@@ -56,7 +59,7 @@ const Avatar = ({ username, variant }) => {
         <div style={containerStyle} >
             <GoPerson />
         </div>
-    )
+    );
 }
 
 

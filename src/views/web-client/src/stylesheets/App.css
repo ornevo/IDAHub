@@ -179,3 +179,12 @@
 }
 .ProjectModeLabel-Public  { color: #30db47; }
 .ProjectModeLabel-Private { color: #d91616; }
+
+/* User selection */
+.UserSelector-input {
+  padding: 6px 0px;
+}
+
+.UserChip {
+  margin: 0 2px;
+}
