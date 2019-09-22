@@ -3,6 +3,7 @@
  */
 
 import { Schema } from "mongoose";
+import mongoosePaginate from "mongoose-paginate";
 import { Models } from "../../utils/constants";
 
 
@@ -34,5 +35,7 @@ const ProjectSchema = Schema({
         default: true
     }
 });
+
+ProjectSchema.plugin(mongoosePaginate);
 
 export default ProjectSchema;

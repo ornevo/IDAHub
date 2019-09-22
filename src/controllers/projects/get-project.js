@@ -1,7 +1,7 @@
 // Handles the api /api/projects/:projectId
 
 import { validateProjectId, validateAuthToken } from "../middleware";
-import { sendJSONResponse } from "../../utils/utils";
+import { sendJSONResponse, isAuthorizedToViewProject } from "../../utils/utils";
 import { getProjectHeaders } from "../../utils/dbhelpers"
 import { Protocol } from "../../utils/constants";
 
@@ -33,11 +33,7 @@ const handler = (req, res) => {
         
         // Only proceed if either public project or private and the authenticated user is either owner or contributor
         if(!req.project.public) {
-            const authenticatedId = (req.jwt || {}).id; 
-            const isOwner = authenticatedId == req.project.owner.toString();
-            const isContributor = projectHeader.contributors.find(cont => cont.id.toString() === authenticatedId) !== undefined;
-
-            if(!authenticatedId || (!isOwner && !isContributor)) {
+            if(!isAuthorizedToViewProject(req.jwt, projectHeader)) {
                 sendJSONResponse(res, "Unautherizated to view project.", false, Protocol.Status.UnauthorizedStatusCode);
                 return;
             }

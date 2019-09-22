@@ -38,5 +38,16 @@ const sendJSONResponse = (res, body, isSuccess, statusCode=-1) => {
 const generateValidatorErrorsArray =
     originalErrsArray => originalErrsArray.map(e => "Error in param '" + e['param'] + "': " + e['msg']);
 
+const isAuthorizedToViewProject = (jwt, projectHeader) => {
+    if(projectHeader.public)
+        return true;
+        
+    const authenticatedId = (jwt || {}).id; 
+    const isOwner = authenticatedId == projectHeader.owner.toString();
+    const isContributor = projectHeader.contributors.find(cont => cont.id.toString() === authenticatedId) !== undefined;
 
-export { createUserDetails, sendJSONResponse, generateValidatorErrorsArray, createProjectHeader };
+    return authenticatedId && (isOwner || isContributor);
+}
+
+
+export { createUserDetails, sendJSONResponse, generateValidatorErrorsArray, createProjectHeader, isAuthorizedToViewProject };
