@@ -10,6 +10,12 @@ export const Models = {
     },
     UserInProject: {
         name: "UserInProject"
+    },
+    Modification: {
+        name: "Modification"
+    },
+    Session: {
+        name: "Session"
     }
 }
 
