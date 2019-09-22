@@ -134,7 +134,7 @@
 
 /* Project blocks */
 /* For squere grid, used this hack: https://medium.com/cloudaper/how-to-create-a-flexible-square-grid-with-css-grid-layout-ea48baf038f3 */
-.ProjectsListContainer {
+.ListContainer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   grid-auto-rows: 1fr;
@@ -143,7 +143,7 @@
   margin-top: 20px;
 }
 
-.ProjectsListContainer::before {
+.ListContainer::before {
   content: '';
   width: 0;
   padding-bottom: 100%;
@@ -151,12 +151,12 @@
   grid-column: 1 / 1;
 }
 
-.ProjectsListContainer > *:first-child {
+.ListContainer > *:first-child {
   grid-row: 1 / 1;
   grid-column: 1 / 1;
 }
 
-.ProjectBlock {
+.ListBlock {
   border: 2px solid #c6c6c6;
   padding: 14px 20px 30px 20px;
   text-align: center;
@@ -166,7 +166,7 @@
   color: inherit;
 }
 
-.ProjectBlock-content {
+.ListBlockContent {
   align-items: center;
 }
 
@@ -187,4 +187,10 @@
 
 .UserChip {
   margin: 0 2px;
+}
+
+/* Search layout small stuff */
+.SearchLayout-query-label {
+  font-style: italic;
+  color: rgba(2,0,36,0.4);
 }

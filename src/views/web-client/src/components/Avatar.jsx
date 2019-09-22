@@ -50,6 +50,12 @@ const Avatar = ({ username, variant }) => {
         containerStyle.height = "30px";
         containerStyle.fontSize = "12px";
         containerStyle.padding = "8px 9px";
+    } else if(variant === "listItem") {
+        containerStyle.width = "70px";
+        containerStyle.height = "70px";
+        containerStyle.fontSize = "20px";
+        containerStyle.padding = "22px";
+        containerStyle.marginBottom = "7px";
     } else {
         throw "Bad Avatar variant.";
     }
@@ -64,7 +70,7 @@ const Avatar = ({ username, variant }) => {
 
 Avatar.propTypes = {
     username: PropTypes.string.isRequired,
-    variant: PropTypes.oneOf(["menu", "chip"])
+    variant: PropTypes.oneOf(["menu", "chip", "listItem"])
 }
 
 Avatar.defaultProps = {

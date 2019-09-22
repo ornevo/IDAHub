@@ -16,15 +16,15 @@ function ProjectsList(props) {
         return <Typography variant="subtitle1">No Projects</Typography>
 
     return (
-        <div className="ProjectsListContainer">
+        <div className="ListContainer">
             {props.projects.map(project => (
-                <Link to={"/project/" + project.id} className="ProjectBlock" key={project.id}>
+                <Link to={"/project/" + project.id} className="ListBlock" key={project.id}>
                     {/* Public / Private */}
                     <Typography variant="caption" className={"ProjectModeLabel-" + boolToIsPublicString(project.public)}>
                         {boolToIsPublicString(project.public)}
                     </Typography>
 
-                    <div className="ProjectBlock-content">
+                    <div className="ListBlockContent">
                         <div className="ProjectBlock-top-icon">
                             <FaBriefcase />
                         </div>

@@ -18,6 +18,7 @@ import Menu from "./components/Menu";
 import HomepageLayout from "./layouts/homepage";
 import NewProjectLayout from "./layouts/NewProject";
 import ProfileLayout from "./layouts/Profile";
+import SearchLayout from "./layouts/Search";
 
 /* Styles importing */
 import './stylesheets/App.css';
@@ -65,9 +66,10 @@ const App = (props) => {
                 (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
               />
               <Route exact path="/new-project" component={__authReqWrapper(NewProjectLayout)} />
-              {/* A not found route back to main */}
-              {/* <Route path="*" component={() => <Redirect to="/" />} />  */}
-
+              {/* See notes above the profile route */}
+              <Route exact path="/search/:query" component={
+                props => <SearchLayout key={props.match.params.query} {...props} />
+              } />
             </div>
           </Router>
         </CredContext.Provider>
