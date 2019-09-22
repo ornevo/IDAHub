@@ -26,7 +26,7 @@
 
 
 .Menu-container {
-    padding: 18px 0;
+    padding: 13px 0;
 
     display: grid;
     align-content: center;
@@ -34,19 +34,15 @@
 }
 
 /* If in homepage, we dont neet the logo column */
-.Menu-bg-homepage .Menu-container { 
+.Menu-bg-homepage .Menu-container {
     grid-template-columns: auto 1fr auto auto;
+    padding-bottom: 23px;
 }
 
 
 .Menu-container > * {
     display: grid;
     align-content: center;
-}
-
-/* Since the profile icon increases the menu height */
-.Menu-container-loggedin {
-    padding: 13px 0;
 }
 
 .Menu-item,

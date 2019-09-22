@@ -43,7 +43,7 @@ const App = (props) => {
     if(newToken)
       setCookie('authToken', newToken, { path: '/' });
     else
-      setCookie('authToken', false);
+      setCookie('authToken', '');
   }
 
   return (
