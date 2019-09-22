@@ -6,6 +6,6 @@ The projects has three components:
 - The server, which is a node/express/mongo stack server in `./Server/src`.
 - The web-client, which presents users with project and account managment interface in `./Server/src/views/web-client`. 
 
-Created by Orr Shachaff, Yonathan Suzy and Or Nevo. 
+Created by [Orr Shachaff](https://github.com/lolblat), Jonathan Suzy and [Or Nevo](https://github.com/ornevo). 
 
 © and stuff.
