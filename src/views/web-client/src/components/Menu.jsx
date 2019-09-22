@@ -11,6 +11,9 @@ import LoginModalContent from "../modals-contents/LoginModalContent";
 import SignupModalContent from "../modals-contents/SignupModalContent";
 import Modal from './Modal';
 import Avatar from "../components/Avatar";
+// import logo from '../res/logo-black.png';
+import logoBG from '../res/logo-gradient-start.png';
+import logoFG from '../res/logo-gradient-end.png';
 
 
 class Menu extends Component {
@@ -37,9 +40,7 @@ class Menu extends Component {
     onNewAuthToken(newToken) {
         this.closeModals();
 
-        // Upon user login/signup:
-        //  1. Set auth token as cookie
-        //  2. redirect to the user's profile page, upon logout redirect to /
+        // Upon user login/signup, redirect to the user's profile page, upon logout redirect to /
         if(!newToken) {
             this.props.history.push("/");
         } else {
@@ -53,6 +54,7 @@ class Menu extends Component {
 
     render() {
         /* LOGGED IN INFO */
+
         const username = this.context ? JWT.decode(this.context).username : "";
         const userId = this.context ? JWT.decode(this.context).id : "";
 
@@ -67,6 +69,14 @@ class Menu extends Component {
         const bgClass = "Menu-bg Menu-bg-" + mode;
 
         /* LINKS DOM */
+
+        // We make the logo change colors by setting the container with a background imag of the logo in color A,
+        //  and the image in color B, and "blinking" the opacity of the image, revealing and hiding the background. 
+        const homeLogoLink = mode == "homepage" ? "" : (
+            <Link to="/" className="Menu-logo-container" style={{ backgroundImage: "url(" + logoBG + ")"}}>
+                <img src={logoFG} className="Menu-logo Menu-item" alt="homepage link" />
+            </Link>
+        );
 
         // Either login/signup buttons, or a logout links
         const accountLinksWhenLoggedIn = [
@@ -104,6 +114,9 @@ class Menu extends Component {
                     menu={
                         <div className={bgClass}>
                             <Container className={containerClass}>
+                                {/* Logo if in homepage */}
+                                { homeLogoLink }
+
                                 {/* For each login-dependent link, render place holder if shouldn't appear */}
                                 { loginDependentLinks.map((link, i) => this.context ? link : <div key={"LoginDependantItemPH-" + i}></div> ) }
 

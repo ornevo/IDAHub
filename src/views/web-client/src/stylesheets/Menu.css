@@ -30,8 +30,14 @@
 
     display: grid;
     align-content: center;
+    grid-template-columns: auto auto 1fr auto auto;
+}
+
+/* If in homepage, we dont neet the logo column */
+.Menu-bg-homepage .Menu-container { 
     grid-template-columns: auto 1fr auto auto;
 }
+
 
 .Menu-container > * {
     display: grid;
@@ -57,3 +63,24 @@
 .Menu-item-homepage { color: whitesmoke; }
 .Menu-item-regular  { color: rgb(2,0,36); }
   
+.Menu-logo {
+    height: 30px;
+    animation-duration: 2.5s;
+    animation-name: opacityBlink;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+.Menu-logo-container {
+    background-image: none; /* will get set in the code */
+    background-repeat: no-repeat;
+    height: 30px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+@keyframes opacityBlink {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
