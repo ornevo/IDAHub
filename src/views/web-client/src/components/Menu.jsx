@@ -51,7 +51,7 @@ class Menu extends Component {
         }
 
         // Propogate up, to set in context
-        this.props.setAuthToken(newToken);   
+        this.props.setAuthToken(newToken);
     }
 
     render() {

@@ -13,7 +13,7 @@ import { query } from 'express-validator/check';
 const validators = [
     validateAuthToken(false),
     defaultParamToMiddleware('page', 'query', 1),
-    query("query").isAlphanumeric().isLength({ max: 50 }),
+    query("query").isAscii().isLength({ max: 50 }),
     query("page").isNumeric()
 ]
 

@@ -28,7 +28,7 @@ import './stylesheets/NewProject.css';
 
 
 const App = (props) => {
-  const [{ authToken }, setCookie, removeCookie] = useCookies(['authToken']);
+  const [{ authToken }, setCookie] = useCookies(['authToken']);
 
   // This returns a component that redirects to '/' if not authenticated, but returns component otherwise
   function __authReqWrapper(component) {
@@ -43,7 +43,7 @@ const App = (props) => {
     if(newToken)
       setCookie('authToken', newToken, { path: '/' });
     else
-      removeCookie('authToken');
+      setCookie('authToken', false);
   }
 
   return (

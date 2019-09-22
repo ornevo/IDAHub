@@ -36,13 +36,13 @@ export const getProjectHeaders = (projectIds, callback) => {
                 let projectHeaders = [];
                 projects.forEach(project => {
                     // The userInProject records for the current project
-                    const currUsersInProject = uInP.filter(uip => uip.projectId.equals(project._id));
-                    
+                    const currUsersInProject = uInP.filter(uip => uip && uip.projectId.equals(project._id));
+
                     // The current projects' contributors' records
                     const currContribsRecords = currUsersInProject.map(uip => allContributorsRecords.find(c => c._id.equals(uip.userId)));
 
                     // The user-header of each contributer
-                    const contributors = currContribsRecords.map(c => createUserDetails(c.username, c._id));
+                    const contributors = currContribsRecords.filter(c => c).map(c => createUserDetails(c.username, c._id));
 
                     const currProjectHeader = createProjectHeader(project, contributors);
                     projectHeaders.push(currProjectHeader);

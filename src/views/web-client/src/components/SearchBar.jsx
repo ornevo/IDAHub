@@ -13,7 +13,14 @@ const SearchBar = ({ currentPath }) => {
     const [inputValue, setInputValue] = useState('');
 
     function onChange(e) {
-        setInputValue(e.target.value);
+        const value = e.target.value;
+        // Filter out illegal characters
+        let filteredValue = '';
+        for (let i = 0; i < value.length; i++)
+            if(value[i].match(/^[a-z 0-9]+$/i))
+                filteredValue += value[i];
+
+        setInputValue(filteredValue);
     }
 
     // On enter
@@ -24,26 +31,30 @@ const SearchBar = ({ currentPath }) => {
     }
 
     // On submit, redirect to search page    
+    let redirectRender = "";
     if(pathWhenSubmitted) {
         if(pathWhenSubmitted === currentPath) {
             // Redirect to main page if nothing to search
             if(!inputValue)
-                return <Redirect to="/" />;
+                redirectRender = <Redirect to="/" />;
             else
-                return <Redirect to={"/search/" + encodeURIComponent(inputValue)} />;
+                redirectRender = <Redirect to={"/search/" + encodeURIComponent(inputValue)} />;
         } else // If finished redirecting
             setPathWhenSubmitted(undefined);
     }
 
     return (
-        <input
-            value={inputValue}
-            className="SearchBar"
-            onChange={onChange}
-            onKeyDown={onKeyDown}
-            style={{ backgroundImage: "url(" + SearchIcon + ")" }}
-            placeholder="Search for users and projects"
-        />
+        <span>
+            { redirectRender }
+            <input
+                value={inputValue}
+                className="SearchBar"
+                onChange={onChange}
+                onKeyDown={onKeyDown}
+                style={{ backgroundImage: "url(" + SearchIcon + ")" }}
+                placeholder="Search for users and projects"
+            />
+        </span>
     )
 }
 
