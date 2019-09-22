@@ -67,9 +67,12 @@ const App = (props) => {
               />
               <Route exact path="/new-project" component={__authReqWrapper(NewProjectLayout)} />
               {/* See notes above the profile route */}
-              <Route exact path="/search/:query" component={
+              <Route path="/search/:query" component={
                 props => <SearchLayout key={props.match.params.query} {...props} />
               } />
+
+              {/* 404 back to main */}
+              <Redirect from='*' to='/' />
             </div>
           </Router>
         </CredContext.Provider>

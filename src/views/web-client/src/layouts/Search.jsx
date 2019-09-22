@@ -17,7 +17,7 @@ class SearchLayout extends React.Component {
     constructor(props) {
         super(props);
 
-        this.query = props.match.params.query || '';
+        this.query = decodeURIComponent(props.match.params.query || '');
 
         this.state = {
             foundProjects: [],
@@ -30,6 +30,12 @@ class SearchLayout extends React.Component {
 
     // Fetches the projects and puts them in the state
     fetchUserSearchResults() {
+        // Spaces can't be in username
+        if(this.query.indexOf(" ") !== -1) {
+            this.setState({foundUsers: [], hasLoadedUsers: true})
+            return;
+        }
+        
         usersSearch(this.query)
             .then(users => {
                 if(users && users.data && !this.state.hasLoadedUsers)
@@ -74,6 +80,8 @@ class SearchLayout extends React.Component {
     }
 
     render() {
+        console.log("HERE");
+
         return (
             <Page title="Search Results">
                 <div>
