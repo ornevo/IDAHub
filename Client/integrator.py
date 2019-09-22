@@ -10,9 +10,15 @@ import constants
 import shared
 from all_events import *
 import time
+from forms.StatusWidget import StatusWidget
+from PyQt5.QtWidgets import qApp, QMainWindow
 
+INTEGRATOR_OBJECT = None
 def log(data):
-	print("[Integrator] " + data)
+	if shared.LOG:
+		print("[Integrator] " + data)
+	else:
+		pass
 
 def create_hidden_window():
 	window_handler = win32gui.CreateWindow("EDIT", "Integrator window hook", 0, 0, 0, 0, 0, 0, 0, 0, None)
@@ -40,7 +46,7 @@ def remove_key_from_reg(id_of_instance):
 
 
 def message_handler(window_handler, msg, wParam, lParam):
-	if wParam == constants.SEND_DATA_TO_IDA: #pass
+	if wParam == constants.SEND_DATA_TO_IDA:
 		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
 		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
 		event_object = create_event_from_dict(event_data)
@@ -48,7 +54,25 @@ def message_handler(window_handler, msg, wParam, lParam):
 		shared.PAUSE_HOOK = True
 		event_object.implement()
 		shared.PAUSE_HOOK = False
+	elif wParam == constants.SET_LOGGED_USER:
+		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
+		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
+		add_logged_user(event_data)
+
+	elif wParam == constants.SET_LOGGED_OFF_USER:
+		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
+		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
+		add_logged_off_user(event_data)
+
 	return True
+
+def add_logged_user(json_dict):
+	manager = INTEGRATOR_OBJECT.get_manager()
+	manager.add_logged_user(json_dict["username"])
+
+def add_logged_off_user(json_dict):
+	manager = INTEGRATOR_OBJECT.get_manager()
+	manager.add_logged_off_user(json_dict["username"])
 
 def create_event_from_dict(json_dict):
 	event_id = json_dict["id"]
@@ -98,7 +122,7 @@ def create_event_from_dict(json_dict):
 	elif event_id == constants.CHANGE_ENUM_NAME_ID: 
 		return ChangeEnumNameEvent(event_data["id"], str(event_data["value"]))
 	elif event_id == constants.CHANGE_FUNCTION_HEADER_ID: 
-		return ChangeFunctionHeaderEvent(event_data["linear-address"], str(event_data["value"]))
+		return ChangeTypeEvent(event_data["linear-address"], str(event_data["value"]))
 	elif event_id == constants.IDA_CURSOR_CHANGE_ID: 
 		return IDACursorEvent(event_data["linear-address"])
 	elif event_id == constants.EXIT_FROM_IDA_ID: 
@@ -129,6 +153,20 @@ action_change_server = idaapi.action_desc_t(
 	"Ctrl+Alt+A"
 )
 
+
+class user_manager():
+	def __init__(self):
+		self._users = []
+	
+	def add_logged_user(self, user):
+		self._users.append({"user": user, "logged": True})
+	
+	def add_logged_off_user(self, user):
+		self._users.append({"user": user, "logged": False})
+	
+	def get_users(self):
+		return self._users
+
 class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 	flags = idaapi.PLUGIN_HIDE | idaapi.PLUGIN_FIX
 	comment = " "
@@ -142,9 +180,15 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 	def ready_to_run(self):
 		idaapi.register_action(action_change_server)
 		idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/ChangeServer","sync:change_server", idaapi.SETMENU_APP)
-	
+		self._manager = user_manager()
+		self._widget = StatusWidget(self._manager)
+		self._widget.install(self._window)
+
 	def init(self):	
-		constants.create_general_config_file()
+		if constants.create_general_config_file(): # if the Config file didnt exist, we want to ask for a server name.
+			server = idc.AskStr("", "Server:")	
+			constants.set_data_to_config_file("server", server)
+				
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 
@@ -164,12 +208,23 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 			communication_manager_window_handler = constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID)
 			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
 			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
+			
 		self.hook()
+		for widget in qApp.topLevelWidgets():
+			if isinstance(widget, QMainWindow):
+				self._window = widget
+				break
 		return idaapi.PLUGIN_KEEP
 
 	def term(self):
 		remove_key_from_reg(self._id)
 		self._id = 0
-		
+		self._widget.uninstall(self._window)
+	
+	def get_manager():
+		return self._manager
+
 def PLUGIN_ENTRY():
-	return integrator()
+	global INTEGRATOR_OBJECT
+	INTEGRATOR_OBJECT = integrator()
+	return INTEGRATOR_OBJECT
