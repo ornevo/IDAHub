@@ -18,7 +18,8 @@ const SearchBar = ({ currentPath }) => {
 
     // On enter
     function onKeyDown(e) {
-        if(e.key === 'Enter')
+        // Only re-submit if changed input
+        if(e.key === 'Enter' && currentPath !== "/search/" + inputValue)
             setPathWhenSubmitted(currentPath);
     }
 
