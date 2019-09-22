@@ -27,8 +27,16 @@ class Menu extends Component {
 
         this.state = {
             loginModalOpen: false,
-            signupModalOpen: false
+            signupModalOpen: false,
+            // To recognize user-login/logout
+            currentContext: this.context || false
         }
+    }
+
+    // Check for loggedin/logout changes for re-render
+    componentDidUpdate() {
+        if(this.state.currentContext !== this.context)
+            this.setState({currentContext: this.context});
     }
 
     closeModals() {
