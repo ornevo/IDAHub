@@ -50,8 +50,6 @@ const handler = (req, res) => {
                 // Keep only projects we are authenticated to see
                 const filteredProjectHeaders = projectHeaders.filter(project => isAuthorizedToViewProject(req.jwt, project));
 
-                console.log(projectHeaders.length, filteredProjectHeaders.length);
-
                 const response = {
                     data: filteredProjectHeaders,
                     pagenum: paginationResult.page,
