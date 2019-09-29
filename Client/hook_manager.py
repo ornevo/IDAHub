@@ -259,7 +259,9 @@ class hook_manager(idaapi.UI_Hooks, idaapi.plugin_t):
 		msg("[IReal]: Init done\n")
 		msg("[IReal]: Waiting for auto analysing\n")
 		constants.create_config_file()
-		constants.create_general_config_file()
+		if constants.create_general_config_file(): # if the Config file didnt exist, we want to ask for a server name.
+			server = idc.AskStr("", "Server:")	
+			constants.set_data_to_config_file("server", server)
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 		

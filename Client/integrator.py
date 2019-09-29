@@ -96,7 +96,7 @@ def create_event_from_dict(json_dict):
 		else:	
 			return ChangeTypeEvent(event_data["linear-address"], str(event_data["variable-type"]))
 	elif event_id == constants.NEW_FUNCTION_ID: 
-		return NewFunctionEvent(event_data["linear-address-start"],event_data["linear-address-end"])
+		return NewFunctionEvent(event_data["linear-address"],event_data["value"])
 	elif event_id == constants.UNDEFINE_DATA_ID: 
 		return UndefineDataEvent(event_data["linear-address"])
 	elif event_id == constants.CHANGE_FUNCTION_START_ID: 
@@ -141,6 +141,7 @@ class ChangeServer(idaapi.action_handler_t):
 	def activate(self, ctx):
 		new_server = idc.AskStr(str(shared.BASE_URL), "Server:")
 		constants.set_data_to_config_file("server",new_server)
+		constants.send_data_to_window(constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID), constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
 		return 1
 
 	def update(self,ctx):
@@ -208,6 +209,7 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 			communication_manager_window_handler = constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID)
 			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
 			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
+			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
 			
 		self.hook()
 		for widget in qApp.topLevelWidgets():

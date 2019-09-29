@@ -73,7 +73,7 @@ def create_general_config_file():
 		except OSError as err: # the dir's could be created
 			pass
 		with open(GENERAL_CONFIG_FILE, 'w') as f:
-			f.write(json.dumps({"log": False, "server": "http://192.168.56.102:3000/"}))
+			f.write(json.dumps({"log": False, "server": "http://192.168.14.7:3000/"}))
 		return True
 	return False
 
@@ -113,6 +113,7 @@ CHANGE_USER = 1401
 
 SET_LOGGED_USER = 1402
 SET_LOGGED_OFF_USER = 1403
+CHANGE_BASE_URL = 1404
 ## Events id.
 
 CHANGE_FUNCTION_NAME_ID = 1

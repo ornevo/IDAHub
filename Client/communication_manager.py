@@ -9,8 +9,8 @@ from Queue import Queue
 import requests
 from threading import Thread, Timer
 from constants import * 
-import shared
 
+BASE_URL = ""
 SECRECT_KEY = ""
 TIMER_ARRAY = []
 THREAD_ARRAY = []
@@ -19,7 +19,7 @@ WINDOW_HANDLER = -1
 USERNAME_ID = -1
 USERNAME = ""
 PROJECT_ID = -1
-DEBUG = True
+DEBUG = False
 
 def create_hidden_window():
 	message_map = {win32con.WM_COPYDATA: message_handler}
@@ -56,8 +56,7 @@ def decode_data(lParam):
 	return data.replace("\x00","")
 
 def message_handler(window_handler, msg, wParam, lParam): 
-	global PROJECT_ID, USERNAME, USERNAME_ID, SECRECT_KEY
-	print wParam
+	global PROJECT_ID, USERNAME, USERNAME_ID, SECRECT_KEY,BASE_URL
 	if wParam == SEND_DATA_TO_SERVER:
 		Thread(target=send_data_to_server, args=(decode_data(lParam), )).start()
 	elif wParam == CHANGE_PROJECT_ID:
@@ -71,6 +70,9 @@ def message_handler(window_handler, msg, wParam, lParam):
 	elif wParam == KILL_COMMUNICATION_MANAGER_MESSAGE_ID:
 		print "Kill start"
 		kill()
+	elif wParam == CHANGE_BASE_URL:
+		data = json.loads(decode_data(lParam))
+		BASE_URL = data["url"]
 
 def send_data_to_server(data):
 	if PROJECT_ID == -1 or SECRECT_KEY == "":
@@ -82,20 +84,11 @@ def send_data_to_server(data):
 	request_data["push-data"] = data_to_send_json
 	headers = {"Authorization" : "Bearer {0}".format(base64.b64encode(SECRECT_KEY))}
 	if data_to_send_json["event-id"] == START_IDA_ID:
-		if DEBUG:
-			requests.post("{0}{1}".format("http://127.0.0.1/", START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
-		else:
-			requests.post("{0}{1}".format(shared.BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+			requests.post("{0}{1}".format(BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 	elif data_to_send_json["event-id"] == EXIT_FROM_IDA_ID:
-		if DEBUG:
-			requests.post("{0}{1}".format("http://127.0.0.1/", END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
-		else:
-			requests.post("{0}{1}".format(shared.BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+			requests.post("{0}{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 	else:
-		if DEBUG:
-			requests.post("{0}{1}".format("http://127.0.0.1/", PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data, headers=headers, timeout=5)
-		else:
-			requests.post("{0}{1}".format(shared.BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data, headers=headers, timeout=5)
+			requests.post("{0}{1}".format(BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data, headers=headers, timeout=5)
 
 def get_last_update_time_from_config():
 	with open(PROJECT_DATA_FILE, 'r') as f:
@@ -103,7 +96,11 @@ def get_last_update_time_from_config():
 			data = json.loads(f.read())
 		except ValueError:
 			return 0
+	if PROJECT_ID in data:
 		return data[PROJECT_ID]["last-update"]
+	else:
+		update_the_config_file(0)
+		return get_data_from_config_file()
 
 def update_the_config_file(current_time):
 	data = {}
@@ -124,14 +121,12 @@ def pull_from_server(integrator_window_key):
 	params = {"project-id": PROJECT_ID, "last-update": get_last_update_time_from_config()}
 	headers = {"Authorization" : "Bearer {0}".format(base64.b64encode(SECRECT_KEY))}
 	try:
-		if DEBUG:
-			req = requests.get("{0}{1}".format("http://127.0.0.1/", GET_PROJECT_CHANGES_PATH.format(PROJECT_ID)), params=params, headers = headers, timeout=2)
-		else:
-			req = requests.get("{0}{1}".format(shared.BASE_URL, GET_PROJECT_CHANGES_PATH.format(PROJECT_ID)), params=params, headers = headers, timeout=2)
+			req = requests.get("{0}{1}".format(BASE_URL, GET_PROJECT_CHANGES_PATH.format(PROJECT_ID)), params=params, headers = headers, timeout=2)
 	except Exception as e:
 		print e
 		return -1	
 	data = req.content
+	print data
 	try:
 		data_parsed = json.loads(data)	
 	except ValueError:
@@ -140,14 +135,15 @@ def pull_from_server(integrator_window_key):
 	new_symbols = data_parsed["symbols"]
 	window_handler_of_integrator = get_window_handler_by_id(integrator_window_key)
 	for symbol in new_symbols:
+		print json.dumps(symbol)
 		send_data_to_window(window_handler_of_integrator, SEND_DATA_TO_IDA, json.dumps(symbol))
 
-	logged_users = data_parsed["logged-on"]
-	for user in logged_users:
-		send_data_to_window(window_handler_of_integrator, SET_LOGGED_USER, json.dumps(user))
-	logged_off_users = data_parsed["logged-off"]
-	for user in logged_off_users:
-		send_data_to_window(window_handler_of_integrator, SET_LOGGED_OFF_USER, json.dumps(user))
+	#logged_users = data_parsed["logged-on"]
+	#for user in logged_users:
+#		send_data_to_window(window_handler_of_integrator, SET_LOGGED_USER, json.dumps(user))
+	#logged_off_users = data_parsed["logged-off"]
+	#for user in logged_off_users:
+#		send_data_to_window(window_handler_of_integrator, SET_LOGGED_OFF_USER, json.dumps(user))
 
 		
 def remove_done_timers():
