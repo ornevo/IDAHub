@@ -34,19 +34,6 @@ def create_hidden_window():
 		raise Exception("Cannot create hidded window!")
 	return window_handler
 
-def insert_to_registery(window_handle):
-	try:
-		key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, SUBMODULE_KEY, 0, win32con.KEY_ALL_ACCESS)
-	except Exception:
-		key = win32api.RegCreateKeyEx(win32con.HKEY_CURRENT_USER, SUBMODULE_KEY, win32con.KEY_ALL_ACCESS, None, winnt.REG_OPTION_NON_VOLATILE, None)[0]
-	win32api.RegSetValueEx(key, str(ID_OF_INSTANCE), 0, win32con.REG_SZ, str(window_handle))
-	
-
-def remove_key_from_reg():
-	key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, SUBMODULE_KEY, 0, win32con.KEY_ALL_ACCESS)
-	if key:
-		win32api.RegDeleteValue(key, str(ID_OF_INSTANCE))
-
 def decode_data(lParam):
 	copy_data = ctypes.cast(lParam, PCOPYDATASTRUCT)
 	data_size = copy_data.contents.cbData
@@ -133,17 +120,16 @@ def pull_from_server(integrator_window_key):
 		return -1
 	update_the_config_file(data_parsed["current-time"])
 	new_symbols = data_parsed["symbols"]
-	window_handler_of_integrator = get_window_handler_by_id(integrator_window_key)
 	for symbol in new_symbols:
 		print json.dumps(symbol)
-		send_data_to_window(window_handler_of_integrator, SEND_DATA_TO_IDA, json.dumps(symbol))
+		send_data_to_window(integrator_window_key, SEND_DATA_TO_IDA, json.dumps(symbol))
 
 	#logged_users = data_parsed["logged-on"]
 	#for user in logged_users:
-#		send_data_to_window(window_handler_of_integrator, SET_LOGGED_USER, json.dumps(user))
+#		send_data_to_window(integrator_window_key, SET_LOGGED_USER, json.dumps(user))
 	#logged_off_users = data_parsed["logged-off"]
 	#for user in logged_off_users:
-#		send_data_to_window(window_handler_of_integrator, SET_LOGGED_OFF_USER, json.dumps(user))
+#		send_data_to_window(integrator_window_key, SET_LOGGED_OFF_USER, json.dumps(user))
 
 		
 def remove_done_timers():
@@ -185,22 +171,19 @@ def keep_alive_op():
 def parse_args():
 	parser = argparse.ArgumentParser(description="Puller for the IDA Plugin IReal")
 	parser.add_argument("integrator_window_key", type=str)
-	parser.add_argument("communication_manager_id", type=str)
 	args  = parser.parse_args()
-	return (args.integrator_window_key, args.communication_manager_id)
+	return args.integrator_window_key
 
-def main(integrator_window_key, communication_manager_id):
-	global TIMER_ARRAY, WINDOW_HANDLER, ID_OF_INSTANCE, SECRECT_KEY, PROJECT_ID
-	ID_OF_INSTANCE = communication_manager_id
+def main(integrator_window_key):
+	global TIMER_ARRAY, WINDOW_HANDLER, SECRECT_KEY, PROJECT_ID
 	WINDOW_HANDLER = create_hidden_window()
-	insert_to_registery(WINDOW_HANDLER)
+	send_data_to_window(integrator_window_key, SET_COMMUNICATION_MANAGER_ID, json.dumps({"id": WINDOW_HANDLER}))
 	pulling(integrator_window_key)
 	keep_alive_op()
 	win32gui.PumpMessages()
 
 def kill():
 	try:
-		remove_key_from_reg()
 		print "Kill removed reg"
 		for thread in TIMER_ARRAY:
 			thread.cancel()
@@ -213,5 +196,5 @@ def kill():
 	win32process.ExitProcess(0)
 
 if __name__ == "__main__":
-	integrator_window_key, communication_manager_id = parse_args()
-	main(integrator_window_key, communication_manager_id)
+	integrator_window_key = parse_args()
+	main(integrator_window_key)

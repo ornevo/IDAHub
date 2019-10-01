@@ -37,11 +37,6 @@ else:
 	  ('lpData', ctypes.c_void_p)]
 
 PCOPYDATASTRUCT = ctypes.POINTER(COPYDATASTRUCT)
-def get_window_handler_by_id(window_id):
-	key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, SUBMODULE_KEY, 0, win32con.KEY_ALL_ACCESS)
-	value = win32api.RegQueryValueEx(key, str(window_id))[0]
-	return value
-
 def send_data_to_window(window_handler, message_type, data):
 	if data:
 		buf = ctypes.create_string_buffer(data)
@@ -114,6 +109,7 @@ CHANGE_USER = 1401
 SET_LOGGED_USER = 1402
 SET_LOGGED_OFF_USER = 1403
 CHANGE_BASE_URL = 1404
+SET_COMMUNICATION_MANAGER_ID = 1405
 ## Events id.
 
 CHANGE_FUNCTION_NAME_ID = 1

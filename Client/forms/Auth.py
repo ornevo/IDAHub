@@ -44,7 +44,11 @@ Login form
 
 def try_to_log_in(username,password):
     try:
-        content = requests.get("{0}{1}".format(shared.BASE_URL, constants.LOGIN_PATH), params={"username":username, "password": password}).content
+        try:
+            content = requests.get("{0}{1}".format(shared.BASE_URL, constants.LOGIN_PATH), params={"username":username, "password": password}).content
+        except Exception as e:
+            warning("Cantconnect to server")
+            return -1
         json_object = json.loads(content)
         if json_object["status"] != "OK":
             return -1

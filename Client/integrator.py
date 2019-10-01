@@ -26,25 +26,7 @@ def create_hidden_window():
 		raise Exception("Cannot create hidded window!")
 	win32gui.SetWindowLong(window_handler, win32con.GWL_WNDPROC, message_handler)
 	return window_handler
-
-def insert_to_registery(window_handle):
-	id_of_instance = struct.unpack(">I", os.urandom(4))[0]
-	try:
-		key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, constants.SUBMODULE_KEY, 0, win32con.KEY_ALL_ACCESS)
-	except Exception:
-		key = win32api.RegCreateKeyEx(win32con.HKEY_CURRENT_USER, constants.SUBMODULE_KEY, win32con.KEY_ALL_ACCESS, None, winnt.REG_OPTION_NON_VOLATILE, None)[0]
-	win32api.RegSetValueEx(key, str(id_of_instance), 0, win32con.REG_SZ, str(window_handle))
-	return id_of_instance
 	
-def remove_key_from_reg(id_of_instance):
-	try:
-		key = win32api.RegOpenKeyEx(win32con.HKEY_CURRENT_USER, constants.SUBMODULE_KEY, 0, win32con.KEY_ALL_ACCESS)
-		if key:
-			win32api.RegDeleteValue(key, str(id_of_instance))
-	except Exception as e:
-		pass
-
-
 def message_handler(window_handler, msg, wParam, lParam):
 	if wParam == constants.SEND_DATA_TO_IDA:
 		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
@@ -58,12 +40,19 @@ def message_handler(window_handler, msg, wParam, lParam):
 		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
 		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
 		add_logged_user(event_data)
-
 	elif wParam == constants.SET_LOGGED_OFF_USER:
 		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
 		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
 		add_logged_off_user(event_data)
-
+	elif wParam == constants.SET_COMMUNICATION_MANAGER_ID:
+		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
+		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
+		shared.COMMUNICATION_MANAGER_WINDOW_ID = event_data["id"]
+		shared.IS_COMMUNICATION_MANAGER_STARTED = True
+		if shared.USERID != -1: #started.
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
 	return True
 
 def add_logged_user(json_dict):
@@ -141,7 +130,7 @@ class ChangeServer(idaapi.action_handler_t):
 	def activate(self, ctx):
 		new_server = idc.AskStr(str(shared.BASE_URL), "Server:")
 		constants.set_data_to_config_file("server",new_server)
-		constants.send_data_to_window(constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID), constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
+		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
 		return 1
 
 	def update(self,ctx):
@@ -153,7 +142,6 @@ action_change_server = idaapi.action_desc_t(
 	ChangeServer(),
 	"Ctrl+Alt+A"
 )
-
 
 class user_manager():
 	def __init__(self):
@@ -194,23 +182,14 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 		shared.LOG = constants.get_data_from_config_file("log")
 
 		self._window_handler = create_hidden_window()
-		self._id = insert_to_registery(self._window_handler)
 		log("Created window")
 
-		shared.INTEGRATOR_WINDOW_ID = self._id
-		shared.COMMUNICATION_MANAGER_WINDOW_ID = struct.unpack(">I", os.urandom(4))[0]
+		shared.INTEGRATOR_WINDOW_ID = self._window_handler
 		si = subprocess.STARTUPINFO()
 		si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-		subprocess.Popen(["python", "{0}\communication_manager.py".format(idaapi.idadir("plugins")), str(shared.INTEGRATOR_WINDOW_ID), str(shared.COMMUNICATION_MANAGER_WINDOW_ID)])
-		time.sleep(1)
+		subprocess.Popen(["python", "{0}\communication_manager.py".format(idaapi.idadir("plugins")), str(shared.INTEGRATOR_WINDOW_ID)])
+		time.sleep(1.5)
 		
-		shared.IS_COMMUNICATION_MANAGER_STARTED = True
-		if shared.USERID != -1: #started.
-			communication_manager_window_handler = constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID)
-			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
-			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
-			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
-			
 		self.hook()
 		for widget in qApp.topLevelWidgets():
 			if isinstance(widget, QMainWindow):
@@ -219,8 +198,6 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 		return idaapi.PLUGIN_KEEP
 
 	def term(self):
-		remove_key_from_reg(self._id)
-		self._id = 0
 		self._widget.uninstall(self._window)
 	
 	def get_manager():
