@@ -8,7 +8,6 @@ import { newProject } from "../shared/API";
 import { CredContext } from "../shared/Contexts";
 
 
-
 export default class NewProjectLayout extends React.Component {
     static contextType = CredContext;
 

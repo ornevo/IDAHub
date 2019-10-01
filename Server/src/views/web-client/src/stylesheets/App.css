@@ -16,6 +16,14 @@
   left: 0;
 }
 
+.Full-screen-backvideo {
+  position: fixed;
+  left: 0;
+  top: 0;
+  outline: none !important;
+  z-index: -9000;
+}
+
 /* Containers */
 .Full-screen-container {
   /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#3884ff+0,943bed+100 */
@@ -53,6 +61,8 @@
   grid-template-rows: 100%;
   /* First the header with arbitrary size, and then the rest taking all the space left */
   grid-template-rows: [row-page-header] auto [row-page-content] 1fr;
+
+  z-index: -8000;
 }
 
 /* The actual white containing div style */

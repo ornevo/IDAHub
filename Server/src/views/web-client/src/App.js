@@ -11,7 +11,6 @@ import { CustomMuiTheme } from "./shared/Constants";
 import { NotificationContainer } from "react-notifications";
 import { useCookies } from 'react-cookie';
 
-
 /* Custom components */
 import Menu from "./components/Menu";
 
@@ -25,6 +24,7 @@ import './stylesheets/App.css';
 import './stylesheets/Menu.css';
 import './stylesheets/Homepage.css';
 import './stylesheets/NewProject.css';
+import BackgroundCyberVideo from './components/BackgroundCyberVideo';
 
 
 const App = (props) => {
@@ -58,6 +58,7 @@ const App = (props) => {
 
             <Menu setAuthToken={setAuthToken}/>
             <div className="Full-screen-container">
+              <BackgroundCyberVideo />
 
               <Route exact path="/" component={HomepageLayout} />
               {/* In order to re-render it on route change since key changes, using this hack: */}
