@@ -31,7 +31,7 @@ IMAGE_PX_DIM = (NUM_OF_NUMBER_COLS*NUMBER_W, NUM_OF_NUMBER_ROWS*NUMBER_H)
 FPS = 12
 ANIMATION_LENGTH = 18  # In seconds
 TICKS_NUM = FPS * ANIMATION_LENGTH
-TRANSITION_CHANCE = 1 / (FPS * 1)  # On average, every second
+TRANSITION_CHANCE = 1 / (FPS * 0.5)  # On average, every second
 MAX_NUM_ALPHA = 80
 MIN_NUM_ALPHA = 30
 TRANSITION_TIME = 2  # In seconds
@@ -137,6 +137,15 @@ def initialize():
         # Num matrix
         NUM_MATRIX = [ [ Number() for col in range(NUM_OF_NUMBER_COLS) ] for row in range(NUM_OF_NUMBER_ROWS) ]
 
+        # For some reason, the first randomization generates very high alpha-s, though it gets smoother later. So we "dump" the first 5 seconds
+        for row in NUM_MATRIX:
+                for num in row:
+                        for i in range(int(FPS * 12)):
+                                num.tick()
+                        num.initial_alpha = num.current_alpha
+
+                                
+
 
 def tick():
         '''
@@ -186,13 +195,6 @@ def close_gif_loop():
                 curr_file = IMAGES_DIR + "/" + str(i).zfill(len(str(TICKS_NUM))) + ".png"
                 image_generator(curr_file)
                 tick()
-
-        # i = TICKS_NUM
-        # while not all(num.has_finished() for num in all_nums):
-        #         curr_file = IMAGES_DIR + "/" + str(i).zfill(len(str(TICKS_NUM))) + ".png"
-        #         image_generator(curr_file)
-        #         tick()
-        #         i += 1
 
 
 def main():

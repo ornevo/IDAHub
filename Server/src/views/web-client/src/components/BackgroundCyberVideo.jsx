@@ -42,7 +42,7 @@ export default class BackgroundCyberVideo extends React.Component {
             <span>
             {
                 locations.map(([x, y]) => (
-                    <video muted autoPlay loop className="Full-screen-backvideo" style={{left: x + "px", top: y + "px"}}>
+                    <video key={x.toString() + "," + y.toString()} muted autoPlay loop className="Full-screen-backvideo" style={{left: x + "px", top: y + "px"}}>
                         <source src="/output.webm" autoPlay="" loop="" type="video/mp4" />
                     </video>
                 ))
