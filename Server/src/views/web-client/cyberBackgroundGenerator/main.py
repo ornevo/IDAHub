@@ -31,9 +31,9 @@ IMAGE_PX_DIM = (NUM_OF_NUMBER_COLS*NUMBER_W, NUM_OF_NUMBER_ROWS*NUMBER_H)
 FPS = 12
 ANIMATION_LENGTH = 18  # In seconds
 TICKS_NUM = FPS * ANIMATION_LENGTH
-TRANSITION_CHANCE = 1 / (FPS * 0.5)  # On average, every second
+TRANSITION_CHANCE = 1 / (FPS * 1)  # On average, every second
 MAX_NUM_ALPHA = 80
-MIN_NUM_ALPHA = 30
+MIN_NUM_ALPHA = 0
 TRANSITION_TIME = 2  # In seconds
 
 
@@ -76,7 +76,7 @@ class Number():
                 return self.is_finishing and self.has_reached_target()
 
         def has_reached_target(self):
-                return abs(self.current_alpha - self.target_alpha) < abs(max(self.alpha_velocity, 0.0001))
+                return abs(self.current_alpha - self.target_alpha) < max(abs(self.alpha_velocity), 0.0001)
 
         def update_velocity(self):
                 self.alpha_velocity = round((self.target_alpha - self.current_alpha) / (TRANSITION_TIME * FPS), 4)
@@ -99,6 +99,11 @@ class Number():
                                self.current_alpha = self.target_alpha
                         else:
                                 self.current_alpha += self.alpha_velocity
+                        # if self.marked:
+                        #         print(self.current_alpha, self.target_alpha, self.alpha_velocity)
+                        #         print(str(abs(self.current_alpha - self.target_alpha)) + " >= " + str(abs(max(self.alpha_velocity, 0.0001))))
+                        if self.current_alpha < MIN_NUM_ALPHA or self.current_alpha > MAX_NUM_ALPHA:
+                                print("WTF")
                         return
 
                 # If here, in no transition
@@ -137,14 +142,14 @@ def initialize():
         # Num matrix
         NUM_MATRIX = [ [ Number() for col in range(NUM_OF_NUMBER_COLS) ] for row in range(NUM_OF_NUMBER_ROWS) ]
 
+        NUM_MATRIX[0][0].marked = True
+
         # For some reason, the first randomization generates very high alpha-s, though it gets smoother later. So we "dump" the first 5 seconds
         for row in NUM_MATRIX:
                 for num in row:
                         for i in range(int(FPS * 12)):
                                 num.tick()
-                        num.initial_alpha = num.current_alpha
-
-                                
+                        num.initial_alpha = num.current_alpha                                
 
 
 def tick():
