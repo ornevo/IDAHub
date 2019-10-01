@@ -9,7 +9,7 @@ import { body } from 'express-validator/check';
 // Some input controll validators
 const validators = [
     body("username").isAlphanumeric().isLength({ max: 50 }),
-    body("password").isAlphanumeric(),
+    body("password").isAscii(),
     body("email").isEmail()
 ]
 

@@ -11,7 +11,7 @@ import { query } from 'express-validator/check';
 // Some input controll validators
 const validators = [
     query("username").isAlphanumeric().isLength({ max: 50 }),
-    query("password").isAlphanumeric()
+    query("password").isAscii()
 ]
 
 // Handler, the route function
