@@ -65,63 +65,62 @@ def add_logged_off_user(json_dict):
 
 def create_event_from_dict(json_dict):
 	event_id = json_dict["id"]
-	event_data = json_dict["data"]
 	if event_id == constants.CHANGE_FUNCTION_NAME_ID: 
-		return ChangeFunctionNameEvent(str(event_data["value"]), event_data["linear-address"])
+		return ChangeFunctionNameEvent(str(json_dict["value"]), json_dict["linear-address"])
 	elif event_id == constants.CHANGE_GLOBAL_VARIABLE_NAME_ID: 
-		if str(event_data["label-type"]) == "public":
+		if str(json_dict["label-type"]) == "public":
 			is_public = True
 		else:
 			is_public = False
-		return ChangeGlobalVariableNameEvent(event_data["linear-address"], str(event_data["value"]), is_public)
+		return ChangeGlobalVariableNameEvent(json_dict["linear-address"], str(json_dict["value"]), is_public)
 	elif event_id == constants.CHANGE_LABEL_NAME_ID: 
-		return ChangeLabelNameEvent(event_data["linear-address"], str(event_data["value"]))
+		return ChangeLabelNameEvent(json_dict["linear-address"], str(json_dict["value"]))
 	elif event_id == constants.SET_COMMENT_ID: 
-		return ChangeCommentEvent(event_data["linear-address"], str(event_data["value"]) ,str(event_data["comment-type"]))
+		return ChangeCommentEvent(json_dict["linear-address"], str(json_dict["value"]) ,str(json_dict["comment-type"]))
 	elif event_id == constants.CHANGE_TYPE_ID: 
-		if ":" in str(event_data["variable-type"]):
-			ea, flags, tid, size = str(event_data["variable-type"]).split(':')
-			return ChangeTypeEvent(int(event_data["linear-address"]), int(flags), int(tid), int(size))
+		if ":" in str(json_dict["variable-type"]):
+			ea, flags, tid, size = str(json_dict["variable-type"]).split(':')
+			return ChangeTypeEvent(int(json_dict["linear-address"]), int(flags), int(tid), int(size))
 		else:	
-			return ChangeTypeEvent(event_data["linear-address"], str(event_data["variable-type"]))
+			return ChangeTypeEvent(json_dict["linear-address"], str(json_dict["variable-type"]))
 	elif event_id == constants.NEW_FUNCTION_ID: 
-		return NewFunctionEvent(event_data["linear-address"],event_data["value"])
+		return NewFunctionEvent(json_dict["linear-address"],json_dict["value"])
 	elif event_id == constants.UNDEFINE_DATA_ID: 
-		return UndefineDataEvent(event_data["linear-address"])
+		return UndefineDataEvent(json_dict["linear-address"])
 	elif event_id == constants.CHANGE_FUNCTION_START_ID: 
-		return ChangeFunctionStartEvent(event_data["linear-address"], str(event_data["value"]))
+		return ChangeFunctionStartEvent(json_dict["linear-address"], str(json_dict["value"]))
 	elif event_id == constants.CHANGE_FUNCTION_END_ID: #Checjed
-		return ChangeFunctionEndEvent(event_data["linear-address"], str(event_data["value"]))
+		return ChangeFunctionEndEvent(json_dict["linear-address"], str(json_dict["value"]))
 	elif event_id == constants.CREATE_STRUCT_ID: 
-		return CreateStructEvent(str(event_data["name"]), event_data["id"])
+		return CreateStructEvent(str(json_dict["name"]), json_dict["id"])
 	elif event_id == constants.CREATE_STRUCT_VARIABLE_ID: #Checed
-		return CreateStructVariableEvent(event_data["id"], event_data["offset"], str(event_data["variable-type"]))
+		return CreateStructVariableEvent(json_dict["id"], json_dict["offset"], str(json_dict["variable-type"]))
 	elif event_id == constants.DELETE_STRUCT_VARIABLE_ID: #Chcked
-		return DeleteStructVariableEvent(event_data["id"], event_data["offset"])
+		return DeleteStructVariableEvent(json_dict["id"], json_dict["offset"])
 	elif event_id == constants.DELETE_STRUCT_ID: 
-		return DeleteStructEvent(event_data["id"])
+		return DeleteStructEvent(json_dict["id"])
 	elif event_id == constants.CHANGE_STRUCT_NAME_ID: 
-		return ChangeStructNameEvent(event_data["id"], str(event_data["value"]))
+		return ChangeStructNameEvent(json_dict["id"], str(json_dict["value"]))
 	elif event_id == constants.CREATE_ENUM_ID: 
-		return CreateEnumEvent(str(event_data["name"]), event_data["id"])
+		return CreateEnumEvent(str(json_dict["name"]), json_dict["id"])
 	elif event_id == constants.CREATE_ENUM_ITEM_ID: 
-		return CreateEnumItemEvent(event_data["id"], str(event_data["name"]), str(event_data["value"]))
+		return CreateEnumItemEvent(json_dict["id"], str(json_dict["name"]), str(json_dict["value"]))
 	elif event_id == constants.DELETE_ENUM_ID: 
-		return DeleteEnumEvent(event_data["id"])
+		return DeleteEnumEvent(json_dict["id"])
 	elif event_id == constants.CHANGE_ENUM_NAME_ID: 
-		return ChangeEnumNameEvent(event_data["id"], str(event_data["value"]))
+		return ChangeEnumNameEvent(json_dict["id"], str(json_dict["value"]))
 	elif event_id == constants.CHANGE_FUNCTION_HEADER_ID: 
-		return ChangeTypeEvent(event_data["linear-address"], str(event_data["value"]))
+		return ChangeTypeEvent(json_dict["linear-address"], str(json_dict["value"]))
 	elif event_id == constants.IDA_CURSOR_CHANGE_ID: 
-		return IDACursorEvent(event_data["linear-address"])
+		return IDACursorEvent(json_dict["linear-address"])
 	elif event_id == constants.EXIT_FROM_IDA_ID: 
 		return ExitIDBEvent()
 	elif event_id == constants.START_IDA_ID: 
 		return StartIDAEvent()
 	elif event_id == constants.CHANGE_STRUCT_MEMBER_NAME_ID: 
-		return ChangeStructItemEvent(event_data["id"], event_data["offset"], str(event_data["value"]))
+		return ChangeStructItemEvent(json_dict["id"], json_dict["offset"], str(json_dict["value"]))
 	elif event_id == constants.DELETE_ENUM_MEMBER_ID: 
-		return DeleteEnumMemberEvent(event_data["id"], event_data["value"])
+		return DeleteEnumMemberEvent(json_dict["id"], json_dict["value"])
 
 class ChangeServer(idaapi.action_handler_t):
 	def __init__(self):
