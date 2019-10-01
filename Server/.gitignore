@@ -64,4 +64,6 @@ dist/
 
 cryptoKeys/
 
+public/
+
 package-lock.json
