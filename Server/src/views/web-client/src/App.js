@@ -17,11 +17,13 @@ import Menu from "./components/Menu";
 import HomepageLayout from "./layouts/homepage";
 import NewProjectLayout from "./layouts/NewProject";
 import ProfileLayout from "./layouts/Profile";
+import ProjectLayout from "./layouts/Project";
 import SearchLayout from "./layouts/Search";
 
 /* Styles importing */
 import './stylesheets/App.css';
 import './stylesheets/Menu.css';
+import './stylesheets/Project.css';
 import './stylesheets/Homepage.css';
 import './stylesheets/NewProject.css';
 import BackgroundCyberVideo from './components/BackgroundCyberVideo';
@@ -63,9 +65,14 @@ const App = (props) => {
               <Route exact path="/" component={HomepageLayout} />
               {/* In order to re-render it on route change since key changes, using this hack: */}
               {/* Check this out: https://stackoverflow.com/a/39150493/3477857 */}
-              <Route exact path="/profile/:userId/:username" component={
+              <Route path="/profile/:userId/:username" component={
                 (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
               />
+
+              <Route exact path="/project/:projectId" component={
+                (props) => <ProjectLayout key={props.match.params.projectId} {...props} />}
+              />
+
               <Route exact path="/new-project" component={__authReqWrapper(NewProjectLayout)} />
               {/* See notes above the profile route */}
               <Route path="/search/:query" component={

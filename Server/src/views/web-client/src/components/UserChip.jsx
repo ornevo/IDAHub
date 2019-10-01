@@ -6,7 +6,7 @@ import Chip from '@material-ui/core/Chip';
 import Avatar from "./Avatar";
 
 
-const UserChip = ({ username, id, onDelete, clickable }) => {
+const UserChip = ({ username, id, onDelete, clickable, isPrimary }) => {
     // Support on click redirect to profile
     const [hasClickedUser, setHasClickedUser] = useState(false);
 
@@ -17,6 +17,8 @@ const UserChip = ({ username, id, onDelete, clickable }) => {
         <Chip
             className="UserChip"
             tabIndex={-1}
+            color={isPrimary ? "primary" : undefined}
+            variant={isPrimary ? "outlined" : undefined}
             label={username}
             onDelete={onDelete}
             onClick={clickable ? (() => setHasClickedUser(true)) : null}
@@ -32,11 +34,13 @@ UserChip.propTypes = {
     // If no function passed, no delete button will be rendered
     onDelete: PropTypes.func,
     // If true, onclick will redirect to the user's profile page.
-    clickable: PropTypes.bool
+    clickable: PropTypes.bool,
+    isPrimary: PropTypes.bool
 }
 
 UserChip.defaultProps = {
-    clickable: true
+    clickable: true,
+    isPrimary: false
 }
 
 

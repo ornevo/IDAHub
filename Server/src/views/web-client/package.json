@@ -10,6 +10,7 @@
     "informed": "^2.11.8",
     "material-ui": "^0.20.2",
     "react": "^16.9.0",
+    "react-countup": "^4.2.2",
     "react-dom": "^16.9.0",
     "react-icons": "^3.7.0",
     "react-modal": "^3.10.1",

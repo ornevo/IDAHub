@@ -1,0 +1,46 @@
+.ProjectContainer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 20px;
+}
+
+.ProjectContainer-contributors-container {
+    grid-column: 2;
+    grid-row: 1/100; /* Span all rows, left column */
+}
+
+.ProjectContainer-contributor { display: block; }
+
+.ProjectContainer-small-statistics {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.ProjectContainer-statistics-block {
+    padding-top: 30px;
+    text-align: center;
+    font-size: 18px;
+}
+
+@media (max-width: 800px) {
+    .ProjectContainer-small-statistics {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .ProjectContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .ProjectContainer-contributors-container {
+        grid-column: 1;
+        grid-row: 1; 
+    }
+}
+
+@media (max-width: 620px) {
+    .ProjectContainer-small-statistics {
+        grid-template-columns: 1fr;
+    }
+}

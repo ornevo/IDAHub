@@ -65,6 +65,22 @@ export const newProject = (authApiKey, projectName, projectDescription, isPrivat
     );
 }
 
+export const getProject = (projectId, authApiKey=null) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.get(URL + "/api/projects/" + projectId, { headers })
+    );
+}
+
+export const getProjectStatistics = (projectId, authApiKey=null) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.get(URL + "/api/projects/" + projectId + "/statistics", { headers })
+    );
+}
+
 export const getUserProjects = (userId, authApiKey=null) => {
     const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
 

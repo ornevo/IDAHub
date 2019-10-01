@@ -8,6 +8,7 @@ import { handleExpressValidatorErrorsMiddleware } from "./middleware";
 // import handlers
 import NewUser from "./users/new-user"; 
 import NewProject from "./projects/new-project"; 
+import Statistics from "./projects/statistics";
 import SearchProjects from "./projects/search-projects";
 import SearchUser from "./users/search-users"; 
 import GetUserProjects from "./users/get-user-projects"; 
@@ -45,6 +46,7 @@ defineRoute(router.post.bind(router), "/api/users", NewUser);
 defineRoute(router.get.bind(router), "/api/users", SearchUser);
 defineRoute(router.get.bind(router), "/api/users/token", GetUserToken);
 defineRoute(router.get.bind(router), "/api/projects/:projectId", GetProject);
+defineRoute(router.get.bind(router), "/api/projects/:projectId/statistics", Statistics);
 defineRoute(router.get.bind(router), "/api/users/:userId/projects", GetUserProjects);
 defineRoute(router.post.bind(router), "/api/projects", NewProject);
 defineRoute(router.get.bind(router), "/api/projects", SearchProjects);
