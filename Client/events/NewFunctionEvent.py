@@ -3,7 +3,7 @@ import ida_funcs
 from constants import *
 class NewFunctionEvent(IEvent):
 	def __init__(self, linear_address_start, linear_address_end):
-		super(NewFunctionEvent, self).__init__(NEW_FUNCTION_ID, "New function", {"linear-address-start": linear_address_start, "linear-address-end": linear_address_end})
+		super(NewFunctionEvent, self).__init__(NEW_FUNCTION_ID, "New function", {"linear-address": linear_address_start, "value": linear_address_end})
 		self._start = linear_address_start
 		self._end = linear_address_end
 

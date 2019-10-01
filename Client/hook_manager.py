@@ -235,8 +235,7 @@ class LiveHook(ida_idp.IDB_Hooks):
 def pass_to_manager(ev):
 	log("Pass to manager: " + str(ev))
 	try:
-		communication_manager_window_handler = constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID)
-		constants.send_data_to_window(communication_manager_window_handler, constants.SEND_DATA_TO_SERVER, ev.encode_to_json())
+		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.SEND_DATA_TO_SERVER, ev.encode_to_json())
 	except Exception as e:
 		pass
 
@@ -259,7 +258,9 @@ class hook_manager(idaapi.UI_Hooks, idaapi.plugin_t):
 		msg("[IReal]: Init done\n")
 		msg("[IReal]: Waiting for auto analysing\n")
 		constants.create_config_file()
-		constants.create_general_config_file()
+		if constants.create_general_config_file(): # if the Config file didnt exist, we want to ask for a server name.
+			server = idc.AskStr("", "Server:")	
+			constants.set_data_to_config_file("server", server)
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 		
@@ -268,6 +269,11 @@ class hook_manager(idaapi.UI_Hooks, idaapi.plugin_t):
 		else:
 			shared.PAUSE_HOOK = True
 	
+		if shared.USERID != -1 and shared.IS_COMMUNICATION_MANAGER_STARTED: #started.
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
+			
 		self.idb_hook = LiveHook()
 		self.ui_hook = ClosingHook()
 		self.idp_hook = LiveHookIDP()
@@ -282,8 +288,7 @@ class hook_manager(idaapi.UI_Hooks, idaapi.plugin_t):
 
 	def term(self):
 		try:
-			communication_manager_window_handler = constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID)
-			constants.send_data_to_window(communication_manager_window_handler, constants.KILL_COMMUNICATION_MANAGER_MESSAGE_ID, None)
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.KILL_COMMUNICATION_MANAGER_MESSAGE_ID, None)
 			time.sleep(1)
 		except Exception as e:
 			pass

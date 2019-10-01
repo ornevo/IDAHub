@@ -17,7 +17,6 @@ from forms.Auth import AuthForm
 import json
 import base64
 
-#TODO add open pdb file and choose project to work on.
 def log(data):
 	print("[Authenticator] " + data)
 
@@ -60,7 +59,10 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 		pass
 
 	def init(self):
-		constants.create_general_config_file()
+		if constants.create_general_config_file(): # if the Config file didnt exist, we want to ask for a server name.
+			server = idc.AskStr("", "Server:")	
+			constants.set_data_to_config_file("server", server)
+		
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 		
@@ -69,16 +71,16 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 		auth.Execute()
 	
 		if shared.IS_COMMUNICATION_MANAGER_STARTED:
-			communication_manager_window_handler = constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID)
-			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
 		
 		if idc.GetIdbPath(): #You open IDA directly with a file.
 			selector = ProjectSelector(request_project_list())
 			selector.Compile()
 			selector.Execute()
+		
 		if shared.IS_COMMUNICATION_MANAGER_STARTED:
-			communication_manager_window_handler = constants.get_window_handler_by_id(shared.COMMUNICATION_MANAGER_WINDOW_ID)
-			constants.send_data_to_window(communication_manager_window_handler, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
 		
 		self._live_hook = LiveHookIDP()
 		self._live_hook.hook()
