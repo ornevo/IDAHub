@@ -1,4 +1,5 @@
 import React from 'react';
+import BackVideo from "../res/cyberBackVideo.webm";
 
 
 const VID_WIDTH = 1368;
@@ -43,7 +44,7 @@ export default class BackgroundCyberVideo extends React.Component {
             {
                 locations.map(([x, y]) => (
                     <video key={x.toString() + "," + y.toString()} muted autoPlay loop className="Full-screen-backvideo" style={{left: x + "px", top: y + "px"}}>
-                        <source src="/output.webm" autoPlay="" loop="" type="video/mp4" />
+                        <source src={BackVideo} autoPlay="" loop="" type="video/mp4" />
                     </video>
                 ))
             }
