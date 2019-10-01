@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import SearchIcon from '../res/searchIcon.png';
+import SearchIconHomepage from "../res/searchIconWhite.png";
 
 
 const SearchBar = ({ currentPath }) => {
@@ -10,6 +11,7 @@ const SearchBar = ({ currentPath }) => {
     //  saving the path to which we redirected and comparing with the current path
     // If it is undefined, it means the user hasn't submitted yet
     const [pathWhenSubmitted, setPathWhenSubmitted] = useState(undefined);
+    const [isFocused, setIsFocused] = useState(false);
     const [inputValue, setInputValue] = useState('');
 
     function onChange(e) {
@@ -28,6 +30,10 @@ const SearchBar = ({ currentPath }) => {
         // Only re-submit if changed input
         if(e.key === 'Enter' && currentPath !== "/search/" + inputValue)
             setPathWhenSubmitted(currentPath);
+    }
+
+    function onFocus(e) {
+
     }
 
     // On submit, redirect to search page    
@@ -50,8 +56,10 @@ const SearchBar = ({ currentPath }) => {
                 value={inputValue}
                 className="SearchBar"
                 onChange={onChange}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
                 onKeyDown={onKeyDown}
-                style={{ backgroundImage: "url(" + SearchIcon + ")" }}
+                style={{ backgroundImage: "url(" + (currentPath == "/" && !isFocused ? SearchIconHomepage : SearchIcon) + ")" }}
                 placeholder="Search for users and projects"
             />
         </span>
