@@ -109,6 +109,10 @@
 }
 
 
-.Menu-bg-homepage .SearchBar {
+.Menu-bg-homepage .SearchBar, .Menu-bg-homepage .SearchBar::placeholder  {
     color: white;
+}
+
+.SearchBar:focus::placeholder {
+    color: black;
 }
