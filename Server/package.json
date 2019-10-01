@@ -5,7 +5,8 @@
   "scripts": {
     "build-client": "cd ./src/views/web-client/; ./build.sh; cd ../../../; ",
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
-    "start": "DEBUG=idahub:server nodemon --ignore 'dist/*' --exec 'npm run build && node ./dist/bin/www'"
+    "start": "npm run build && forever start --minUptime 1000 --spinSleepTime 1000 ./dist/bin/www",
+    "stop": "forever stop ./dist/bin/www"
   },
   "dependencies": {
     "babel-cli": "^6.26.0",
