@@ -17,6 +17,7 @@ import GetProject from "./projects/get-project";
 import NewChange from "./Changes Updating/new-change";
 import StartSession from  "./Real Time Collaboration/start-session";
 import StopSession from  "./Real Time Collaboration/stop-session";
+import PullChanges from  "./Real Time Collaboration/pull-changes";
 
 
 /*
@@ -53,5 +54,6 @@ defineRoute(router.get.bind(router), "/api/projects", SearchProjects);
 defineRoute(router.post.bind(router), "/api/projects/:projectId/push", NewChange);
 defineRoute(router.post.bind(router), "/api/projects/:projectId/session/start", StartSession);
 defineRoute(router.post.bind(router), "/api/projects/:projectId/session/stop", StopSession);
+defineRoute(router.get.bind(router), "/api/projects/:projectId/changes", PullChanges);
 
 export default router;
