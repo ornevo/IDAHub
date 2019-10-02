@@ -36,11 +36,10 @@ const handler = (req, res) => {
     newModification.userId = a.id;
     newModification.timestamp = (Math.floor(new Date().getTime()/1000.0)).toString();
     newModification.eventId = req.body["event-id"];
-
-
+    req.body = JSON.stringify(req.body)
 
     //check the rest input
-    if(!((req.body['linear-address'] && typeof req.body["linear-address"]=="number") || req.body['linear-address']==false)){
+    if(!((req.body.hasOwnProperty('linear-address') && typeof req.body["linear-address"]=="number") || req.body.hasOwnProperty('linear-address')==false)){
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -112,7 +111,7 @@ const handler = (req, res) => {
     }
 
 
-    if(!(   (req.body.hasOwnProperty('name') && typeof req.body.name=="string") || req.body.hasOwnProperty('name')==false   )   ){
+    if(!((req.body.hasOwnProperty('name') && typeof req.body.name=="string") || req.body.hasOwnProperty('name')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -124,7 +123,7 @@ const handler = (req, res) => {
     }
 
 
-    if(!(   (req.body.hasOwnProperty('id') && typeof req.body.id=="string") || req.body.hasOwnProperty('id')==false   )   ){
+    if(!((req.body.hasOwnProperty('id') && typeof req.body.id=="string") || req.body.hasOwnProperty('id')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -144,7 +143,7 @@ const handler = (req, res) => {
             sendJSONResponse(res, "error", false);
             return;
         }
-    
+        var flag = false;
         const searchedProjectIds = foundDocs.map(d => d.projectId);
         for(var v=0;v<searchedProjectIds.length;v++){
             var vv=searchedProjectIds[v].toString();
