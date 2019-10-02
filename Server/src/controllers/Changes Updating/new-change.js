@@ -40,12 +40,12 @@ const handler = (req, res) => {
 
 
     //check the rest input
-    if(!((req.body.hasOwnProperty('linear-address') && typeof req.body["linear-address"]=="number") || req.body.hasOwnProperty('linear-address')==false)){
+    if(!((req.body['linear-address'] && typeof req.body["linear-address"]=="number") || req.body['linear-address']==false)){
         sendJSONResponse(res, "inputError", false);
         return;
     }
     else{
-        if(req.body.hasOwnProperty('linear-address') )
+        if(req.body['linear-address'])
             newModification.linearAddress = req.body["linear-address"];
         else
             newModification.linearAddress = null;
