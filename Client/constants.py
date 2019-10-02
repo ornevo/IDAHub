@@ -14,15 +14,21 @@ GET_PROJECT_CHANGES_PATH = "api/projects/{0}/changes"
 PUSH_DATA_TO_PROJECT  = "api/projects/{0}/push"
 LIST_USER_PROJECT = "api/users/{0}/projects"
 START_SESSION = "api/projects/{0}/session/start"
-END_SESSION = "api/projects/{0}/session/end"
+END_SESSION = "api/projects/{0}/session/stop"
 PROJECT_DATA_FILE = "{0}\\IDAHub\\projects.dat".format(os.getenv("APPDATA"))
 GENERAL_CONFIG_FILE = "{0}\\IDAHub\\config.cfg".format(os.getenv("APPDATA"))
 SUBMODULE_KEY = "Software\\Hex-Rays\\IDA\\IPC\\Handler"
 SERVER_PUBLIC_KEY_PATH = "{0}\\IDAHub\\key.pub".format(os.getenv("APPDATA"))
 SERVER_PUBLIC_KEY = ""
+DEFAULT_SERVER = "https://idahub.live"
 
-with open(SERVER_PUBLIC_KEY_PATH, "r") as f:
-	SERVER_PUBLIC_KEY = f.read()
+if os.path.isfile(SERVER_PUBLIC_KEY_PATH):
+	with open(SERVER_PUBLIC_KEY_PATH, "r") as f:
+		SERVER_PUBLIC_KEY = f.read()
+else:
+	if not os.path.isdir("{0}\\IDAHub".format(os.getenv("APPDATA"))):
+		os.mkdir("{0}\\IDAHub".format(os.getenv("APPDATA")))
+	SERVER_PUBLIC_KEY = ""
 
 context64bit = sys.maxsize > 2**32
 if context64bit:
@@ -68,7 +74,7 @@ def create_general_config_file():
 		except OSError as err: # the dir's could be created
 			pass
 		with open(GENERAL_CONFIG_FILE, 'w') as f:
-			f.write(json.dumps({"log": False, "server": "http://192.168.14.7:3000/"}))
+			f.write(json.dumps({"log": False, "server": DEFAULT_SERVER}))
 		return True
 	return False
 
@@ -155,3 +161,5 @@ BLUE_COLOR = 0xFF9999
 PURPLE_COLOR = 0xCC6699
 PINK_COLOR = 0x9966FF
 GREY_COLOR = 0x999999
+
+COLOR_ARRAY = [BLACK_COLOR, RED_COLOR, ORANGE_COLOR, YELLOW_COLOR, GREEN_COLOR, LTGREEN_COLOR, BLACK_COLOR, PURPLE_COLOR, PINK_COLOR, GREY_COLOR]

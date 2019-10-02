@@ -66,16 +66,16 @@ def send_data_to_server(data):
 		return -1
 	data_to_send_json = json.loads(data)
 	print data_to_send_json
-	data_to_send_json["project-id"] = PROJECT_ID
+	data_to_send_json["projectId"] = PROJECT_ID
 	request_data = {}
 	request_data["push-data"] = data_to_send_json
-	headers = {"Authorization" : "Bearer {0}".format(base64.b64encode(SECRECT_KEY))}
+	headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
 	if data_to_send_json["event-id"] == START_IDA_ID:
-			requests.post("{0}{1}".format(BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+			requests.post("{0}/{1}".format(BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 	elif data_to_send_json["event-id"] == EXIT_FROM_IDA_ID:
-			requests.post("{0}{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+			requests.post("{0}/{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 	else:
-			requests.post("{0}{1}".format(BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data, headers=headers, timeout=5)
+			requests.post("{0}/{1}".format(BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data, headers=headers, timeout=5)
 
 def get_last_update_time_from_config():
 	with open(PROJECT_DATA_FILE, 'r') as f:
@@ -105,10 +105,10 @@ def update_the_config_file(current_time):
 def pull_from_server(integrator_window_key):
 	if PROJECT_ID == -1 or SECRECT_KEY == "":
 		return -1
-	params = {"project-id": PROJECT_ID, "last-update": get_last_update_time_from_config()}
-	headers = {"Authorization" : "Bearer {0}".format(base64.b64encode(SECRECT_KEY))}
+	params = {"projectId": PROJECT_ID, "lastUpdate": get_last_update_time_from_config()}
+	headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
 	try:
-			req = requests.get("{0}{1}".format(BASE_URL, GET_PROJECT_CHANGES_PATH.format(PROJECT_ID)), params=params, headers = headers, timeout=2)
+			req = requests.get("{0}/{1}".format(BASE_URL, GET_PROJECT_CHANGES_PATH.format(PROJECT_ID)), data=params, headers = headers, timeout=2)
 	except Exception as e:
 		print e
 		return -1	
@@ -118,18 +118,19 @@ def pull_from_server(integrator_window_key):
 		data_parsed = json.loads(data)	
 	except ValueError:
 		return -1
-	update_the_config_file(data_parsed["current-time"])
+	data_parsed = data_parsed["body"]
+	update_the_config_file(data_parsed["curtimestamp"])
 	new_symbols = data_parsed["symbols"]
 	for symbol in new_symbols:
 		print json.dumps(symbol)
 		send_data_to_window(integrator_window_key, SEND_DATA_TO_IDA, json.dumps(symbol))
 
-	#logged_users = data_parsed["logged-on"]
-	#for user in logged_users:
-#		send_data_to_window(integrator_window_key, SET_LOGGED_USER, json.dumps(user))
-	#logged_off_users = data_parsed["logged-off"]
-	#for user in logged_off_users:
-#		send_data_to_window(integrator_window_key, SET_LOGGED_OFF_USER, json.dumps(user))
+	logged_users = data_parsed["loggedOn"]
+	for user in logged_users:
+		send_data_to_window(integrator_window_key, SET_LOGGED_USER, json.dumps(user))
+	logged_off_users = data_parsed["loggedOff"]
+	for user in logged_off_users:
+		send_data_to_window(integrator_window_key, SET_LOGGED_OFF_USER, json.dumps(user))
 
 		
 def remove_done_timers():

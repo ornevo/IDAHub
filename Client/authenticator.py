@@ -16,6 +16,14 @@ from forms.ProjectSelector import ProjectSelector
 from forms.Auth import AuthForm
 import json
 import base64
+from all_events import StartIDAEvent
+
+def pass_to_manager(ev):
+	log("Pass to manager: " + str(ev))
+	try:
+		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.SEND_DATA_TO_SERVER, ev.encode_to_json())
+	except Exception as e:
+		pass
 
 def log(data):
 	print("[Authenticator] " + data)
@@ -24,7 +32,7 @@ def request_project_list():
 	array_result = []
 	headers = {"Authorization" : "Bearer {0}".format(base64.b64encode(shared.USER_TOKEN))}
 	try:
-		result = requests.get("{0}{1}".format(shared.BASE_URL, constants.LIST_USER_PROJECT.format(str(shared.USERID))), headers = headers)
+		result = requests.get("{0}/{1}".format(shared.BASE_URL, constants.LIST_USER_PROJECT.format(str(shared.USERID))), headers = headers)
 		project_headers = json.loads(result.content)
 	except Exception as e:
 		Warning(str(e))
@@ -59,10 +67,6 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 		pass
 
 	def init(self):
-		if constants.create_general_config_file(): # if the Config file didnt exist, we want to ask for a server name.
-			server = idc.AskStr("", "Server:")	
-			constants.set_data_to_config_file("server", server)
-		
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 		
@@ -81,7 +85,10 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 		if shared.IS_COMMUNICATION_MANAGER_STARTED:
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
-		
+
+		if not shared.PAUSE_HOOK:
+			pass_to_manager(StartIDAEvent())
+			
 		self._live_hook = LiveHookIDP()
 		self._live_hook.hook()
 		self.hook()
