@@ -22,7 +22,7 @@ const validators = [
     // body("label-type").isString(),
     // body("comment-type").isString(),
     // body( "offset").isNumeric(),
-    // body("variable-type").isString(),
+    // body("variableType").isString(),
     // body("name").isString(),
     // body("id").isString()
 ]
@@ -46,9 +46,9 @@ const handler = (req, res) => {
     }
     else{
         if(req.body.hasOwnProperty('linear-address') )
-            newModification["linear-address"] = req.body["linear-address"];
+            newModification.linearAddress = req.body["linear-address"];
         else
-            newModification["linear-address"] = null;
+            newModification.linearAddress = null;
     }
 
 
@@ -70,9 +70,9 @@ const handler = (req, res) => {
     }
     else{
         if(req.body.hasOwnProperty('label-type') )
-            newModification["label-type"] = req.body["label-type"];
+            newModification.labelType = req.body["label-type"];
         else
-            newModification["label-type"] = null;
+            newModification.labelType = null;
     }
 
 
@@ -82,9 +82,9 @@ const handler = (req, res) => {
     }
     else{
         if(req.body.hasOwnProperty('comment-type') )
-            newModification["comment-type"] = req.body["comment-type"];
+            newModification.commentType = req.body["comment-type"];
         else
-            newModification["comment-type"] = null;
+            newModification.commentType = null;
     }
     
 
@@ -100,15 +100,15 @@ const handler = (req, res) => {
     }
 
 
-    if(!(   (req.body.hasOwnProperty('variable-type') && typeof req.body["variable-type"] =="string") || req.body.hasOwnProperty('variable-type')==false   )   ){
+    if(!(   (req.body.hasOwnProperty('variable-type') && typeof req.body["variable-type"]=="string") || req.body.hasOwnProperty('variable-type')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
     else{
         if(req.body.hasOwnProperty('variable-type') )
-            newModification["variable-type"] = req.body["variable-type"];
+            newModification.variableType = req.body["variable-type"];
         else
-            newModification["variable-type"] = null;
+            newModification.variableType = null;
     }
 
 
