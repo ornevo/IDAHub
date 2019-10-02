@@ -15,14 +15,14 @@ const validators = [
        validateProjectId(),
      // check the authentication
      validateAuthToken(),
-     body("eventId").exists(),
-     body( "eventId").isNumeric()
-    // body( "linearAddress").isNumeric(),
+     body("event-id").exists(),
+     body("event-id").isNumeric()
+    // body( "linear-address").isNumeric(),
      //body("value").isString(),
-    // body("labelType").isString(),
-    // body("commentType").isString(),
+    // body("label-type").isString(),
+    // body("comment-type").isString(),
     // body( "offset").isNumeric(),
-    // body("variableType").isString(),
+    // body("variable-type").isString(),
     // body("name").isString(),
     // body("id").isString()
 ]
@@ -35,24 +35,24 @@ const handler = (req, res) => {
     const a=req.jwt;
     newModification.userId = a.id;
     newModification.timestamp = (Math.floor(new Date().getTime()/1000.0)).toString();
-    newModification.eventId = req.body.eventId;
+    newModification.eventId = req.body["event-id"];
 
 
 
     //check the rest input
-    if(!(   (req.body.hasOwnProperty('linearAddress') && typeof req.body.linearAddress=="number") || req.body.hasOwnProperty('linearAddress')==false   )   ){
+    if(!((req.body.hasOwnProperty('linear-address') && typeof req.body["linear-address"]=="number") || req.body.hasOwnProperty('linear-address')==false)){
         sendJSONResponse(res, "inputError", false);
         return;
     }
     else{
-        if(req.body.hasOwnProperty('linearAddress') )
-            newModification.linearAddress = req.body.linearAddress;
+        if(req.body.hasOwnProperty('linear-address') )
+            newModification["linear-address"] = req.body["linear-address"];
         else
-            newModification.linearAddress = null;
+            newModification["linear-address"] = null;
     }
 
 
-    if(!(   (req.body.hasOwnProperty('value') && typeof req.body.value=="string") || req.body.hasOwnProperty('value')==false   )   ){
+    if(!((req.body.hasOwnProperty('value') && typeof req.body.value=="string") || req.body.hasOwnProperty('value')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -64,27 +64,27 @@ const handler = (req, res) => {
     }
     
 
-    if(!(   (req.body.hasOwnProperty('labelType') && typeof req.body.labelType=="string") || req.body.hasOwnProperty('labelType')==false   )   ){
+    if(!(   (req.body.hasOwnProperty('label-type') && typeof req.body["label-type"] =="string") || req.body.hasOwnProperty('label-type')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
     else{
-        if(req.body.hasOwnProperty('labelType') )
-            newModification.labelType = req.body.labelType;
+        if(req.body.hasOwnProperty('label-type') )
+            newModification["label-type"] = req.body["label-type"];
         else
-            newModification.labelType = null;
+            newModification["label-type"] = null;
     }
 
 
-    if(!(   (req.body.hasOwnProperty('commentType') && typeof req.body.commentType=="string") || req.body.hasOwnProperty('commentType')==false   )   ){
+    if(!(   (req.body.hasOwnProperty('comment-type') && typeof req.body["comment-type"]=="string") || req.body.hasOwnProperty('comment-type')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
     else{
-        if(req.body.hasOwnProperty('commentType') )
-            newModification.commentType = req.body.commentType;
+        if(req.body.hasOwnProperty('comment-type') )
+            newModification["comment-type"] = req.body["comment-type"];
         else
-            newModification.commentType = null;
+            newModification["comment-type"] = null;
     }
     
 
@@ -100,15 +100,15 @@ const handler = (req, res) => {
     }
 
 
-    if(!(   (req.body.hasOwnProperty('variableType') && typeof req.body.variableType=="string") || req.body.hasOwnProperty('variableType')==false   )   ){
+    if(!(   (req.body.hasOwnProperty('variable-type') && typeof req.body["variable-type"] =="string") || req.body.hasOwnProperty('variable-type')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
     else{
-        if(req.body.hasOwnProperty('variableType') )
-            newModification.variableType = req.body.variableType;
+        if(req.body.hasOwnProperty('variable-type') )
+            newModification["variable-type"] = req.body["variable-type"];
         else
-            newModification.variableType = null;
+            newModification["variable-type"] = null;
     }
 
 
