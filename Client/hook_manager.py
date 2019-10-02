@@ -265,11 +265,14 @@ class hook_manager(idaapi.UI_Hooks, idaapi.plugin_t):
 		shared.LOG = constants.get_data_from_config_file("log")
 		
 		if idc.GetIdbPath() and ida_auto.auto_is_ok():
+			log("Start")
 			shared.PAUSE_HOOK = False
 		else:
 			shared.PAUSE_HOOK = True
 	
 		if shared.USERID != -1 and shared.IS_COMMUNICATION_MANAGER_STARTED: #started.
+			if not shared.PAUSE_HOOK:
+				pass_to_manager(StartIDAEvent())
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))

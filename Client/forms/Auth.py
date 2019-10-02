@@ -5,6 +5,7 @@ import json
 import constants
 import shared
 import json
+import os
 
 class AuthForm(Form):
     def __init__(self):
@@ -31,12 +32,15 @@ Login form
                 warning("Error, invalid username and password {0} {1}".format(self.GetControlValue(self.iUserName), self.GetControlValue(self.iPassword)))
             else:
                 try:
+                    if not constants.SERVER_PUBLIC_KEY:
+                        warning("You need to create the public key at path: {0}".format("{0}\\IDAHub".format(os.getenv("APPDATA"))))
+                        return 1
                     decoded_token = jwt.decode(user_token, constants.SERVER_PUBLIC_KEY, algorithms=["RS256"], audience=self.GetControlValue(self.iUserName))
                     shared.USERID = decoded_token["id"]
                     shared.USERNAME = decoded_token["username"]
                     shared.USER_TOKEN = user_token                                                                          
                 except Exception as e:
-                    warning("Problem with server signing!")
+                    warning("Problem with server signing! " + str(e))
                     return 0
                 return 1
         else:
@@ -45,9 +49,9 @@ Login form
 def try_to_log_in(username,password):
     try:
         try:
-            content = requests.get("{0}{1}".format(shared.BASE_URL, constants.LOGIN_PATH), params={"username":username, "password": password}).content
+            content = requests.get("{0}/{1}".format(shared.BASE_URL, constants.LOGIN_PATH), params={"username":username, "password": password}).content
         except Exception as e:
-            warning("Cantconnect to server")
+            warning("Cant connect to server " + str(e))
             return -1
         json_object = json.loads(content)
         if json_object["status"] != "OK":

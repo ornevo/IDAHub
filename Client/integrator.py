@@ -1,4 +1,5 @@
 import idaapi
+import random
 import ctypes
 import win32api
 import win32gui
@@ -11,9 +12,17 @@ import shared
 from all_events import *
 import time
 from forms.StatusWidget import StatusWidget
+from forms.painter import Painter
 from PyQt5.QtWidgets import qApp, QMainWindow
+from all_events import StartIDAEvent
 
-INTEGRATOR_OBJECT = None
+def pass_to_manager(ev):
+	log("Pass to manager: " + str(ev))
+	try:
+		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.SEND_DATA_TO_SERVER, ev.encode_to_json())
+	except Exception as e:
+		pass
+
 def log(data):
 	if shared.LOG:
 		print("[Integrator] " + data)
@@ -56,12 +65,11 @@ def message_handler(window_handler, msg, wParam, lParam):
 	return True
 
 def add_logged_user(json_dict):
-	manager = INTEGRATOR_OBJECT.get_manager()
-	manager.add_logged_user(json_dict["username"])
+	USER_MANAGER.add_logged_user(json_dict["username"])
 
 def add_logged_off_user(json_dict):
-	manager = INTEGRATOR_OBJECT.get_manager()
-	manager.add_logged_off_user(json_dict["username"])
+	USER_MANAGER.remove_logged_user(json_dict["username"])
+	#manager.add_logged_off_user(json_dict["username"])
 
 def create_event_from_dict(json_dict):
 	event_id = json_dict["id"]
@@ -122,38 +130,40 @@ def create_event_from_dict(json_dict):
 	elif event_id == constants.DELETE_ENUM_MEMBER_ID: 
 		return DeleteEnumMemberEvent(json_dict["id"], json_dict["value"])
 
-class ChangeServer(idaapi.action_handler_t):
-	def __init__(self):
-		idaapi.action_handler_t.__init__(self)
-
-	def activate(self, ctx):
-		new_server = idc.AskStr(str(shared.BASE_URL), "Server:")
-		constants.set_data_to_config_file("server",new_server)
-		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
-		return 1
-
-	def update(self,ctx):
-		return idaapi.AST_ENABLE_ALWAYS
-
-action_change_server = idaapi.action_desc_t(
-	"sync:change_server",
-	"Change main server",
-	ChangeServer(),
-	"Ctrl+Alt+A"
-)
 
 class user_manager():
 	def __init__(self):
 		self._users = []
+		self._used_colors = []
 	
 	def add_logged_user(self, user):
-		self._users.append({"user": user, "logged": True})
-	
-	def add_logged_off_user(self, user):
-		self._users.append({"user": user, "logged": False})
-	
+		for user_dict in self._users:
+			if user == user_dict["user"]:
+				return 0
+		color = random.choice(list(set(constants.COLOR_ARRAY) - set(self._used_colors)))
+		self._used_colors.append(color)
+		self._users.append({"user": user, "logged": True, "ea": 0, "color": color})
+
+	def change_ea_of_user(self, user, ea):
+		for user_dict in self._users:
+			if user_dict["user"] == user:
+				user_dict["ea"] = ea
+
+	def remove_logged_user(self, user):
+		tmp_arr = []
+		user_color = ""
+		for user_dict in self._users:
+			if user_name != user_dict["user"]:
+				tmp_arr.append({"user": user_dict["user"], "logged": user_dict["logged"], "ea": user_dict["ea"], "color": user_dict["color"]})
+			else:
+				user_color = user_dict["color"]
+		self._used_colors = list(set(self._used_colors) - set(user_color))
+		self._users = tmp_arr
+
 	def get_users(self):
 		return self._users
+
+USER_MANAGER = user_manager()
 
 class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 	flags = idaapi.PLUGIN_HIDE | idaapi.PLUGIN_FIX
@@ -166,17 +176,11 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 		pass
 
 	def ready_to_run(self):
-		idaapi.register_action(action_change_server)
-		idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/ChangeServer","sync:change_server", idaapi.SETMENU_APP)
-		self._manager = user_manager()
-		self._widget = StatusWidget(self._manager)
+		self._widget = StatusWidget(USER_MANAGER)
 		self._widget.install(self._window)
+		self._painter = Painter(USER_MANAGER)
 
 	def init(self):	
-		if constants.create_general_config_file(): # if the Config file didnt exist, we want to ask for a server name.
-			server = idc.AskStr("", "Server:")	
-			constants.set_data_to_config_file("server", server)
-				
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 
@@ -188,7 +192,9 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 		si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 		subprocess.Popen(["python", "{0}\communication_manager.py".format(idaapi.idadir("plugins")), str(shared.INTEGRATOR_WINDOW_ID)])
 		time.sleep(1.5)
-		
+
+		if not shared.PAUSE_HOOK:
+			pass_to_manager(StartIDAEvent())
 		self.hook()
 		for widget in qApp.topLevelWidgets():
 			if isinstance(widget, QMainWindow):
@@ -199,10 +205,5 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 	def term(self):
 		self._widget.uninstall(self._window)
 	
-	def get_manager():
-		return self._manager
-
 def PLUGIN_ENTRY():
-	global INTEGRATOR_OBJECT
-	INTEGRATOR_OBJECT = integrator()
-	return INTEGRATOR_OBJECT
+	return integrator()
