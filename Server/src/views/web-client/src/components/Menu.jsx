@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Link, withRouter } from "react-router-dom";
 import ResponsiveMenu from 'react-responsive-navbar';
 import Container from '@material-ui/core/Container';
-import TextField from '@material-ui/core/TextField';
 import JWT from "jsonwebtoken";
 
 import { CredContext } from "../shared/Contexts";
@@ -82,7 +81,7 @@ class Menu extends Component {
 
         // We make the logo change colors by setting the container with a background imag of the logo in color A,
         //  and the image in color B, and "blinking" the opacity of the image, revealing and hiding the background. 
-        const homeLogoLink = mode == "homepage" ? "" : (
+        const homeLogoLink = mode === "homepage" ? "" : (
             <Link to="/" className="Menu-logo-container" style={{ backgroundImage: "url(" + logoBG + ")"}}>
                 <img src={logoFG} className="Menu-logo Menu-item" alt="homepage link" />
             </Link>

@@ -109,7 +109,6 @@ class NewProjectForm extends React.Component {
                             name="projectName"
                             helperText="Please choose a name for the project"
                             fullWidth
-                            autoFocus
                         />
                         {/* public/private control */}
                         <div className="NewProjectForm-switch-container">

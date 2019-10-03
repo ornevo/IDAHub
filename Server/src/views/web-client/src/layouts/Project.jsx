@@ -1,9 +1,7 @@
 import React from 'react';
 import { NotificationManager } from "react-notifications";
-import { Types } from "mongoose";
 
 import Page from '../components/Page';
-import NewProjectForm from "../forms/NewProjectForm";
 import { getProject, getProjectStatistics } from "../shared/API";
 import { CredContext } from "../shared/Contexts";
 import { Typography } from '@material-ui/core';
@@ -35,7 +33,7 @@ class Project extends React.Component {
                     this.setState({ statistics })
             })
             .catch(err => {
-                if(err.statusCode == 401)
+                if(err.statusCode === 401)
                     this.setState({isAuthorized: false});
                 else
                     NotificationManager.error(err.body);
@@ -52,7 +50,7 @@ class Project extends React.Component {
                     this.setState({project: projectHeader});
             })
             .catch(err => {
-                if(err.statusCode == 401)
+                if(err.statusCode === 401)
                     this.setState({isAuthorized: false});
                 else
                     NotificationManager.error(err.body);
@@ -127,7 +125,7 @@ class Project extends React.Component {
                                         <UserChip 
                                             id={user.id}
                                             username={user.username}
-                                            isPrimary={user.id == this.state.project.owner}
+                                            isPrimary={user.id === this.state.project.owner}
                                             clickable={true} />
                                     </span>
                                 );

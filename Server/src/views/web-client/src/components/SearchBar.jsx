@@ -32,10 +32,6 @@ const SearchBar = ({ currentPath }) => {
             setPathWhenSubmitted(currentPath);
     }
 
-    function onFocus(e) {
-
-    }
-
     // On submit, redirect to search page    
     let redirectRender = "";
     if(pathWhenSubmitted) {
@@ -59,7 +55,7 @@ const SearchBar = ({ currentPath }) => {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 onKeyDown={onKeyDown}
-                style={{ backgroundImage: "url(" + (currentPath == "/" && !isFocused ? SearchIconHomepage : SearchIcon) + ")" }}
+                style={{ backgroundImage: "url(" + (currentPath === "/" && !isFocused ? SearchIconHomepage : SearchIcon) + ")" }}
                 placeholder="Search for users and projects"
             />
         </span>

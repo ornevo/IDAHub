@@ -2,7 +2,6 @@ import React from 'react';
 import { NotificationManager } from "react-notifications";
 import { Typography } from '@material-ui/core';
 
-import { safeget } from "../shared/Utils";
 import Page from '../components/Page';
 import { CredContext } from "../shared/Contexts";
 import { usersSearch, projectsSearch } from "../shared/API";

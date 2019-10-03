@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Typography } from '@material-ui/core';
 import { FaBriefcase } from 'react-icons/fa';
@@ -12,7 +12,7 @@ const boolToIsPublicString = b => b ? "Public" : "Private";
 
 
 function ProjectsList(props) {
-    if(props.projects.length == 0)
+    if(props.projects.length === 0)
         return <Typography variant="subtitle1">No Projects</Typography>
 
     return (

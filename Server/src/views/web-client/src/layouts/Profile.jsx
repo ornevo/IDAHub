@@ -79,7 +79,7 @@ export default class ProfileLayout extends React.Component {
             ownedProjects = this.state.projects.filter(proj => proj.owner === this.state.userId);
             // All the project in which profile owner is in the contributors list.
             contributingProjects = this.state.projects.filter(proj => (
-                (proj.owner !== this.state.userId) && proj.contributors.find(contr => contr.id == this.state.userId)
+                (proj.owner !== this.state.userId) && proj.contributors.find(contr => contr.id === this.state.userId)
             ));
 
             // Make sure they compliment each other

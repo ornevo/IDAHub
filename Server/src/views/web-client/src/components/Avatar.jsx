@@ -57,7 +57,7 @@ const Avatar = ({ username, variant }) => {
         containerStyle.padding = "22px";
         containerStyle.marginBottom = "7px";
     } else {
-        throw "Bad Avatar variant.";
+        throw new Error("Bad Avatar variant.");
     }
 
     return (
