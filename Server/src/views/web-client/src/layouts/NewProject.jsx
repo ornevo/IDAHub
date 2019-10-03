@@ -1,6 +1,7 @@
 import React from 'react';
 import { NotificationManager } from "react-notifications";
 import { Types } from "mongoose";
+import { Redirect } from "react-router-dom";
 
 import Page from '../components/Page';
 import NewProjectForm from "../forms/NewProjectForm";
@@ -10,6 +11,11 @@ import { CredContext } from "../shared/Contexts";
 
 export default class NewProjectLayout extends React.Component {
     static contextType = CredContext;
+
+    constructor(props) {
+        super(props);
+        this.state = { createdProjectId: '' };
+    }
 
     validate(values) {
         let { projectName, projectDescription, isPrivate, contributers, reversedFileHash } = values;
@@ -61,11 +67,16 @@ export default class NewProjectLayout extends React.Component {
         newProject(authApiKey, projectName, projectDescription, isPrivate, contributers, reversedFileHash).then(
             newProjectHeader => {
                 NotificationManager.success("Project created");
+                const projId = newProjectHeader['project-header'].id;
+                this.setState({ createdProjectId: projId });
             }
         ).catch(error => NotificationManager.error(error.body));
     }
 
     render() {
+        if(this.state.createdProjectId)
+            return <Redirect to={"/project/" + this.state.createdProjectId} />
+
         return (
             <Page title="New Project">
                 <NewProjectForm onSubmit={this.onSubmit.bind(this)} />
