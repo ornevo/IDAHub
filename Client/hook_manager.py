@@ -13,6 +13,7 @@ import ida_hexrays
 import ida_typeinf
 import ida_nalt
 import ida_auto
+import ida_struct
 import shared
 last_ea = None
 def log(data):
@@ -24,7 +25,7 @@ def log(data):
 class CursorChangeHook(ida_kernwin.View_Hooks):
 	def view_loc_changed(self, view, now, was):
 		if now.plce.toea() != was.plce.toea():
-			pass_to_manager(IDACursorEvent(now.plce.toea()))
+			pass_to_manager(IDACursorEvent(now.plce.toea(), shared.USERNAME))
 
 class ClosingHook(idaapi.UI_Hooks):
 	def __init__(self):
@@ -35,6 +36,15 @@ class ClosingHook(idaapi.UI_Hooks):
 		log("Exit IDB")
 		pass_to_manager(ExitIDBEvent())
 		return idaapi.UI_Hooks.term(self)
+	
+	def ready_to_run(self):
+		shared.PAINTER.ready_to_run()
+
+	def get_ea_hint(self, ea):
+		return shared.PAINTER.get_ea_hint(ea)
+
+	def widget_visible(self, widget):
+		shared.PAINTER.widget_visible(widget)
 
 class LiveHookIDP(ida_idp.IDP_Hooks):
 	def ev_undefine(self, ea):
@@ -54,6 +64,12 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 		shared.PAUSE_HOOK = not ida_auto.auto_is_ok()
 		return ida_idp.IDP_Hooks.ev_oldfile(self, fname)
 
+	def ev_get_bg_color(self, color,ea):
+		value = shared.PAINTER.get_bg_color(ea)
+		if value is not None:
+			ctypes.c_uint.from_address(long(color)).value = value
+			return 1
+		return 0
 class LiveHook(ida_idp.IDB_Hooks):
 	def closebase(self):
 		log("Exit IDB")
@@ -61,7 +77,8 @@ class LiveHook(ida_idp.IDB_Hooks):
 		shared.PAUSE_HOOK = True
 		
 	def renamed(self, ea, new_name, is_local_name):		
-		if not shared.PAUSE_HOOK:
+		if not shared.PAUSE_HOOK and (not new_name.startswith("loc_") and not new_name.startswith("sub_") and not new_name.startswith("unk_") and 
+									not new_name.startswith("dword_") and not new_name.startswith("word_") and not new_name.startswith("qword_") and not new_name.startswith("byte_")) :
 			log("Name changed: {0}  = {1} | {2}".format(hex(ea),new_name, is_local_name))
 			flags_of_address = idc.GetFlags(ea)
 			if idaapi.isFunc(flags_of_address):
@@ -70,7 +87,7 @@ class LiveHook(ida_idp.IDB_Hooks):
 				if is_local_name:
 					pass_to_manager(ChangeLabelNameEvent(ea, new_name))
 				else:
-					pass_to_manager(ChangeGlobalVariableNameEvent(ea, new_name, not is_local_name))
+					pass_to_manager(ChangeGlobalVariableNameEvent(ea, new_name,not is_local_name))
 		return ida_idp.IDB_Hooks.renamed(self,ea,new_name,is_local_name)
 
 	def changing_cmt(self, ea, repeatable_cmt, newcmt):
@@ -94,8 +111,7 @@ class LiveHook(ida_idp.IDB_Hooks):
 	def set_func_end(self, pfn, new_end):
 		if not shared.PAUSE_HOOK:
 			log("New end: {0}".format(new_end))
-			name = get_func_name(pfn.start_ea).name
-			pass_to_manager(ChangeFunctionEndEvent(name, new_end))
+			pass_to_manager(ChangeFunctionEndEvent(pfn.start_ea, new_end))
 		return ida_idp.IDB_Hooks.set_func_end(self, pfn, new_end)
 
 	def struc_created(self, struc_id):
@@ -107,7 +123,7 @@ class LiveHook(ida_idp.IDB_Hooks):
 	def renaming_struc(self, sid, oldname, newname):
 		if not shared.PAUSE_HOOK:
 			log("Rename struct")
-			pass_to_manager(ChangeStructNameEvent(sid, newname))
+			pass_to_manager(ChangeStructNameEvent(oldname, newname))
 		return ida_idp.IDB_Hooks.renaming_struc(self, sid, oldname, newname)
 	
 	def struc_member_created(self, sptr, mptr):
@@ -125,19 +141,19 @@ class LiveHook(ida_idp.IDB_Hooks):
 				member_type = 'dq'
 			else:
 				pass
-			pass_to_manager(CreateStructVariableEvent(sptr.id, mptr.get_soff(), member_type, ida_struct.get_member_name(mptr.id)))
+			pass_to_manager(CreateStructVariableEvent(ida_struct.get_struc_name(sptr.id), mptr.get_soff(), member_type, ida_struct.get_member_name(mptr.id)))
 		return ida_idp.IDB_Hooks.struc_member_created(self, sptr, mptr)
 		
 	def renaming_struc_member(self, sptr, mptr, newname):
 		if not shared.PAUSE_HOOK:
 			log("Rename struct member")
-			pass_to_manager(ChangeStructItemEvent(sptr.id, mptr.get_soff(), newname))
+			pass_to_manager(ChangeStructItemEvent(ida_struct.get_struc_name(sptr.id), mptr.get_soff(), newname))
 		return ida_idp.IDB_Hooks.renaming_struc_member(self, sptr, mptr, newname)
 
 	def struc_member_deleted(self, sptr, member_id, offset):
 		if not shared.PAUSE_HOOK:
 			log("Remove struct memeber")
-			pass_to_manager(DeleteStructVariableEvent(sptr.id, offset))
+			pass_to_manager(DeleteStructVariableEvent(ida_struct.get_struc_name(sptr.id), offset))
 		return ida_idp.IDB_Hooks.struc_member_deleted(self, sptr, member_id, offset)
 		
 	def struc_deleted(self, struc_id):
@@ -161,7 +177,7 @@ class LiveHook(ida_idp.IDB_Hooks):
 			elif flag & ida_bytes.FF_STRUCT:
 				data_type = ti.tid
 			if data_type:
-				pass_to_manager(ChangeStructItemTypeEvent(sptr.id, mptr.get_soff(), data_type))
+				pass_to_manager(ChangeStructItemTypeEvent(ida_struct.get_struc_name(sptr.id), mptr.get_soff(), data_type))
 		return 0
 
 	def changing_range_cmt(self, kind, a, cmt, repeatable):
@@ -181,50 +197,58 @@ class LiveHook(ida_idp.IDB_Hooks):
 	def renaming_enum(self, eid, is_enum, newname):
 		if not shared.PAUSE_HOOK:
 			log("Enum name changed {0} {1} {2}".format(eid, is_enum, newname))
-			pass_to_manager(ChangeEnumNameEvent(eid, newname))
+			old_name = ida_enum.get_enum_name(eid)
+			if is_enum:
+				pass_to_manager(ChangeEnumNameEvent(old_name, newname))
+			else:
+				pass_to_manager(ChangeEnumMemberName(old_name, newname))
 		return ida_idp.IDB_Hooks.renaming_enum(self, eid, is_enum, newname)
 
 	def enum_member_created(self, id, cid):
 		if not shared.PAUSE_HOOK:
 			log("Enum memeber created: {0} {1}".format(id, cid))
+			name = ida_enum.get_enum_name(id)
 			enum_item_name = ida_enum.get_enum_member_name(cid)
 			value = ida_enum.get_enum_member_value(cid)
-			#TODO find how to get value from enum
-			pass_to_manager(CreateEnumItemEvent(id, enum_item_name , value))
+			pass_to_manager(CreateEnumItemEvent(name, enum_item_name , value))
 		return ida_idp.IDB_Hooks.enum_member_created(self, id, cid)
 
-	def enum_member_deleted(self, id_of_struct, cid):
+	def deleting_enum_member(self, id_of_struct, cid):
 		if not shared.PAUSE_HOOK:
 			log("Enum member deleted {0} {1}".format(id_of_struct, cid))
-			pass_to_manager(DeleteEnumMemberEvent(id_of_struct , cid))
-		return ida_idp.IDB_Hooks.enum_member_deleted(self, id_of_struct, cid)
+			name = ida_enum.get_enum_name(id_of_struct)
+			value = ida_enum.get_enum_member_value(cid)
+			serial = ida_enum.get_enum_member_serial(cid)
+			bmask = ida_enum.get_enum_member_bmask(cid)
+			pass_to_manager(DeleteEnumMemberEvent(name , value, serial, bmask))
+		return ida_idp.IDB_Hooks.deleting_enum_member(self, id_of_struct, cid)
 
-	def enum_deleted(self, id):
+	def deleting_enum(self, id):
 		if not shared.PAUSE_HOOK:
 			log("Enum deleted")
-			pass_to_manager(DeleteEnumEvent(id))
+			pass_to_manager(DeleteEnumEvent(ida_enum.get_enum_name(id)))
 		return ida_idp.IDB_Hooks.enum_deleted(self, id)		
 
 	def extra_cmt_changed(self, ea, line_idx, cmt):
 		if not shared.PAUSE_HOOK:
 			log("{0} {1}".format(line_idx, cmt))
 			if line_idx / 1000 == 1:
-				pass_to_manager(ChangeCommentEvent(ea, "{0}:{1}".format(line_idx, cmt), "anterior"))
+				pass_to_manager(ChangeCommentEvent(ea, cmt, "anterior", line_idx))
 			else:
-				pass_to_manager(ChangeCommentEvent(ea, "{0}:{1}".format(line_idx, cmt), "posterior"))
+				pass_to_manager(ChangeCommentEvent(ea, cmt, "posterior", line_idx))
 		return ida_idp.IDB_Hooks.extra_cmt_changed(self, ea, line_idx, cmt)
 
 	def ti_changed(self, ea, type, fnames):
 		if not shared.PAUSE_HOOK:
 			log("Ti changed: {0} {1} {2}".format(str(ea), str(type), str(fnames)))
 			flags_of_address = idc.GetFlags(ea)
-			pass_to_manager(ChangeTypeEvent(ea, ida_typeinf.idc_get_type_raw(ea)))
+			pass_to_manager(ChangeTypeEvent(ea, ida_typeinf.idc_get_type_raw(ea),is_make_data = False))
 		return ida_idp.IDB_Hooks.ti_changed(self, ea, type, fnames)
 
 	def make_data(self, ea, flags, tid, len):
 		if not shared.PAUSE_HOOK:
 			log("Make data: {0} {1} {2} {3}".format(ea, flags, tid, len))
-			pass_to_manager(ChangeTypeEvent(ea, flags, tid, len))
+			pass_to_manager(ChangeTypeEvent(ea, flags, tid, len, is_make_data= True))
 		return ida_idp.IDB_Hooks.make_data(self, ea, flags, tid, len)
 		
 	def auto_empty_finally(self):

@@ -1,5 +1,5 @@
 from IEvent import IEvent
-import idc
+import ida_enum
 from constants import *
 class CreateEnumEvent(IEvent):
 	def __init__(self, name, id_of_enum):
@@ -8,4 +8,4 @@ class CreateEnumEvent(IEvent):
 		self._name = name
 
 	def implement(self):
-		idc.AddEnum(self._id, self._name, 0)
+		ida_enum.add_enum(int(self._id), self._name, 0)

@@ -9,4 +9,5 @@ class ChangeEnumNameEvent(IEvent):
 		self._value = value
 
 	def implement(self):
-		ida_enum.set_enum_name(self._id, self._value)
+		id_of_enum = ida_enum.get_enum(str(self._id))
+		ida_enum.set_enum_name(id_of_enum, self._value)

@@ -65,44 +65,47 @@ def message_handler(window_handler, msg, wParam, lParam):
 	return True
 
 def add_logged_user(json_dict):
-	USER_MANAGER.add_logged_user(json_dict["username"])
+	shared.USER_MANAGER.add_logged_user(json_dict["username"])
+	shared.PAINTER.refresh()
 
 def add_logged_off_user(json_dict):
-	USER_MANAGER.remove_logged_user(json_dict["username"])
-	#manager.add_logged_off_user(json_dict["username"])
+	shared.USER_MANAGER.remove_logged_user(json_dict["username"])
+	shared.PAINTER.refresh()
 
 def create_event_from_dict(json_dict):
-	event_id = json_dict["id"]
+	event_id = json_dict["eventId"]
 	if event_id == constants.CHANGE_FUNCTION_NAME_ID: 
-		return ChangeFunctionNameEvent(str(json_dict["value"]), json_dict["linear-address"])
+		return ChangeFunctionNameEvent(json_dict["linearAddress"], str(json_dict["value"]))
 	elif event_id == constants.CHANGE_GLOBAL_VARIABLE_NAME_ID: 
-		if str(json_dict["label-type"]) == "public":
+		if str(json_dict["labelType"]) == "public":
 			is_public = True
 		else:
 			is_public = False
-		return ChangeGlobalVariableNameEvent(json_dict["linear-address"], str(json_dict["value"]), is_public)
+		return ChangeGlobalVariableNameEvent(json_dict["linearAddress"], str(json_dict["value"]), is_public)
 	elif event_id == constants.CHANGE_LABEL_NAME_ID: 
-		return ChangeLabelNameEvent(json_dict["linear-address"], str(json_dict["value"]))
+		return ChangeLabelNameEvent(json_dict["linearAddress"], str(json_dict["value"]))
 	elif event_id == constants.SET_COMMENT_ID: 
-		return ChangeCommentEvent(json_dict["linear-address"], str(json_dict["value"]) ,str(json_dict["comment-type"]))
+		return ChangeCommentEvent(json_dict["linearAddress"], str(json_dict["value"]) ,str(json_dict["commentType"]), json_dict["name"])
 	elif event_id == constants.CHANGE_TYPE_ID: 
-		if ":" in str(json_dict["variable-type"]):
-			ea, flags, tid, size = str(json_dict["variable-type"]).split(':')
-			return ChangeTypeEvent(int(json_dict["linear-address"]), int(flags), int(tid), int(size))
+		if ":" in str(json_dict["variableType"]):
+			ea, flags, tid, size = str(json_dict["variableType"]).split(':')
+			return ChangeTypeEvent(int(json_dict["linearAddress"]), int(flags), int(tid), int(size), True)
 		else:	
-			return ChangeTypeEvent(json_dict["linear-address"], str(json_dict["variable-type"]))
+			return ChangeTypeEvent(json_dict["linearAddress"], str(json_dict["variableType"]), is_make_data = False)
 	elif event_id == constants.NEW_FUNCTION_ID: 
-		return NewFunctionEvent(json_dict["linear-address"],json_dict["value"])
+		return NewFunctionEvent(json_dict["linearAddress"],json_dict["value"])
 	elif event_id == constants.UNDEFINE_DATA_ID: 
-		return UndefineDataEvent(json_dict["linear-address"])
+		return UndefineDataEvent(json_dict["linearAddress"])
 	elif event_id == constants.CHANGE_FUNCTION_START_ID: 
-		return ChangeFunctionStartEvent(json_dict["linear-address"], str(json_dict["value"]))
+		return ChangeFunctionStartEvent(json_dict["linearAddress"], str(json_dict["value"]))
 	elif event_id == constants.CHANGE_FUNCTION_END_ID: #Checjed
-		return ChangeFunctionEndEvent(json_dict["linear-address"], str(json_dict["value"]))
+		return ChangeFunctionEndEvent(json_dict["linearAddress"], str(json_dict["value"]))
 	elif event_id == constants.CREATE_STRUCT_ID: 
 		return CreateStructEvent(str(json_dict["name"]), json_dict["id"])
 	elif event_id == constants.CREATE_STRUCT_VARIABLE_ID: #Checed
-		return CreateStructVariableEvent(json_dict["id"], json_dict["offset"], str(json_dict["variable-type"]))
+		return CreateStructVariableEvent(str(json_dict["id"]), str(json_dict["offset"]), str(json_dict["variableType"]), str(json_dict["value"]))
+	elif event_id == constants.CHANGE_STRUCT_ITEM_TYPE_ID:
+		return ChangeStructItemTypeEvent(str(json_dict["id"]), json_dict["offset"], json_dict["variableType"])
 	elif event_id == constants.DELETE_STRUCT_VARIABLE_ID: #Chcked
 		return DeleteStructVariableEvent(json_dict["id"], json_dict["offset"])
 	elif event_id == constants.DELETE_STRUCT_ID: 
@@ -117,10 +120,10 @@ def create_event_from_dict(json_dict):
 		return DeleteEnumEvent(json_dict["id"])
 	elif event_id == constants.CHANGE_ENUM_NAME_ID: 
 		return ChangeEnumNameEvent(json_dict["id"], str(json_dict["value"]))
-	elif event_id == constants.CHANGE_FUNCTION_HEADER_ID: 
-		return ChangeTypeEvent(json_dict["linear-address"], str(json_dict["value"]))
+	elif event_id == constants.CHANGE_ENUM_MEMBER_NAME_ID:
+		return ChangeEnumMemberName(json_dict["id"], str(json_dict["value"]))
 	elif event_id == constants.IDA_CURSOR_CHANGE_ID: 
-		return IDACursorEvent(json_dict["linear-address"])
+		return IDACursorEvent(json_dict["linearAddress"], json_dict["name"], shared.USER_MANAGER)
 	elif event_id == constants.EXIT_FROM_IDA_ID: 
 		return ExitIDBEvent()
 	elif event_id == constants.START_IDA_ID: 
@@ -128,8 +131,8 @@ def create_event_from_dict(json_dict):
 	elif event_id == constants.CHANGE_STRUCT_MEMBER_NAME_ID: 
 		return ChangeStructItemEvent(json_dict["id"], json_dict["offset"], str(json_dict["value"]))
 	elif event_id == constants.DELETE_ENUM_MEMBER_ID: 
-		return DeleteEnumMemberEvent(json_dict["id"], json_dict["value"])
-
+		value, serial, bmask = json_dict["value"].split(":")
+		return DeleteEnumMemberEvent(json_dict["id"], value, serial, bmask)
 
 class user_manager():
 	def __init__(self):
@@ -146,14 +149,17 @@ class user_manager():
 
 	def change_ea_of_user(self, user, ea):
 		for user_dict in self._users:
+			if  user == shared.USERNAME:
+				continue
 			if user_dict["user"] == user:
 				user_dict["ea"] = ea
+		shared.PAINTER.refresh()
 
 	def remove_logged_user(self, user):
 		tmp_arr = []
 		user_color = ""
 		for user_dict in self._users:
-			if user_name != user_dict["user"]:
+			if user != user_dict["user"]:
 				tmp_arr.append({"user": user_dict["user"], "logged": user_dict["logged"], "ea": user_dict["ea"], "color": user_dict["color"]})
 			else:
 				user_color = user_dict["color"]
@@ -163,7 +169,8 @@ class user_manager():
 	def get_users(self):
 		return self._users
 
-USER_MANAGER = user_manager()
+shared.USER_MANAGER = user_manager()
+shared.PAINTER = Painter(shared.USER_MANAGER)
 
 class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 	flags = idaapi.PLUGIN_HIDE | idaapi.PLUGIN_FIX
@@ -176,9 +183,8 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 		pass
 
 	def ready_to_run(self):
-		self._widget = StatusWidget(USER_MANAGER)
+		self._widget = StatusWidget(shared.USER_MANAGER)
 		self._widget.install(self._window)
-		self._painter = Painter(USER_MANAGER)
 
 	def init(self):	
 		shared.BASE_URL = constants.get_data_from_config_file("server")

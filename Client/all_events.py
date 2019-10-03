@@ -23,3 +23,4 @@ from events.NewFunctionEvent import NewFunctionEvent
 from events.StartIDAEvent import StartIDAEvent
 from events.DeleteEnumMemberEvent import DeleteEnumMemberEvent
 from events.UndefineDataEvent import UndefineDataEvent
+from events.ChangeEnumMemberName import ChangeEnumMemberName
