@@ -2,7 +2,7 @@
 
 /* React imports */
 import React from 'react';
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -19,6 +19,7 @@ import NewProjectLayout from "./layouts/NewProject";
 import ProfileLayout from "./layouts/Profile";
 import ProjectLayout from "./layouts/Project";
 import SearchLayout from "./layouts/Search";
+import DownloadLayout from "./layouts/Download";
 
 /* Styles importing */
 import './stylesheets/App.css';
@@ -62,25 +63,28 @@ const App = (props) => {
             <div className="Full-screen-container">
               <BackgroundCyberVideo />
 
-              <Route exact path="/" component={HomepageLayout} />
-              {/* In order to re-render it on route change since key changes, using this hack: */}
-              {/* Check this out: https://stackoverflow.com/a/39150493/3477857 */}
-              <Route path="/profile/:userId/:username" component={
-                (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
-              />
+              <Switch>
+                <Route exact path="/" component={HomepageLayout} />
+                <Route exact path="/download" component={DownloadLayout} />
+                {/* In order to re-render it on route change since key changes, using this hack: */}
+                {/* Check this out: https://stackoverflow.com/a/39150493/3477857 */}
+                <Route path="/profile/:userId/:username" component={
+                  (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
+                />
 
-              <Route exact path="/project/:projectId" component={
-                (props) => <ProjectLayout key={props.match.params.projectId} {...props} />}
-              />
+                <Route exact path="/project/:projectId" component={
+                  (props) => <ProjectLayout key={props.match.params.projectId} {...props} />}
+                />
 
-              <Route exact path="/new-project" component={__authReqWrapper(NewProjectLayout)} />
-              {/* See notes above the profile route */}
-              <Route path="/search/:query" component={
-                props => <SearchLayout key={props.match.params.query} {...props} />
-              } />
+                <Route exact path="/new-project" component={__authReqWrapper(NewProjectLayout)} />
+                {/* See notes above the profile route */}
+                <Route path="/search/:query" component={
+                  props => <SearchLayout key={props.match.params.query} {...props} />
+                } />
 
-              {/* 404 back to main */}
-              <Redirect from='*' to='/' />
+                {/* 404 back to main */}
+                <Route component={() => <Redirect from='*' to='/' />} />
+              </Switch>
             </div>
           </Router>
         </CredContext.Provider>
