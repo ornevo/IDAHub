@@ -24,14 +24,17 @@
   z-index: -9000;
 }
 
-/* Containers */
-.Full-screen-container {
+.GradientBackground {
   /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#3884ff+0,943bed+100 */
   background: #3884ff; /* Old browsers */
   background: -moz-linear-gradient(-45deg, #3884ff 0%, #943bed 100%); /* FF3.6-15 */
   background: -webkit-linear-gradient(-45deg, #3884ff 0%,#943bed 100%); /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(135deg, #3884ff 0%,#943bed 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3884ff', endColorstr='#943bed',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+/* Containers */
+.Full-screen-container {
   height: 100vh;
   overflow-y: auto;
 
@@ -140,6 +143,55 @@
 
 .ReactModal__Overlay--before-close{
   opacity: 0;
+}
+
+/* Download styling */
+/* Sorry for the !importants, it's to overcome MUI */
+.DownloadButton-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.DownloadButton-homepage {
+  background: white !important;
+  color: #665ff6 !important;
+  margin-top: 20px !important;
+}
+
+.DownloadButton-download-page {
+  color: white !important;
+  margin-bottom: 20px !important;
+
+  -webkit-box-shadow: 0px 5px 21px -15px rgba(0,0,0,0.64);
+  -moz-box-shadow: 0px 5px 21px -15px rgba(0,0,0,0.64);
+  box-shadow: 0px 5px 21px -15px rgba(0,0,0,0.64);
+  width: 200px;
+  grid-column: 2;
+
+  position: relative;
+  top: 0px;
+}
+
+.DownloadButton-download-page:hover {
+  -webkit-box-shadow: 0px 7px 24px -16px rgba(0,0,0,0.85);
+  -moz-box-shadow: 0px 7px 24px -16px rgba(0,0,0,0.85);
+  box-shadow: 0px 7px 24px -16px rgba(0,0,0,0.85);
+
+  transition: top 0.2s;
+  position: relative;
+  top: -2px;
+}
+
+.DownloadButton-download-page svg,
+.DownloadButton-homepage svg {
+  margin-right: 7px;
+}
+
+
+.snippet {
+  font-family: "Courier New", Courier, monospace;
+  background: rgba(253, 202, 64, 0.25);
+  padding: 2px 5px;
 }
 
 /* Project blocks */

@@ -60,7 +60,7 @@ const App = (props) => {
           <Router>
 
             <Menu setAuthToken={setAuthToken}/>
-            <div className="Full-screen-container">
+            <div className="Full-screen-container GradientBackground">
               <BackgroundCyberVideo />
 
               <Switch>

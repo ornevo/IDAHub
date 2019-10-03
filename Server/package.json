@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build-client": "cd ./src/views/web-client/; ./build.sh; cd ../../../; ",
-    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
+    "compress-client": "tar -zcvf ./dist/public/static/client.tar.gz ../Client",
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files && npm run 'compress-client'",
     "start": "DEBUG=idahub:server nodemon --ignore 'dist/*' --exec 'npm run build && node ./dist/bin/www'"
   },
   "dependencies": {
