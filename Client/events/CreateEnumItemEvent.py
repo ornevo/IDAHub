@@ -9,4 +9,5 @@ class CreateEnumItemEvent(IEvent):
 		self._value = value
 
 	def implement(self):
-		ida_enum.add_enum_member(self._id, self._name, self._value)
+		id_of_enum = ida_enum.get_enum(str(self._id))
+		ida_enum.add_enum_member(id_of_enum, self._name, long(self._value))

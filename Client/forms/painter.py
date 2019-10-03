@@ -74,7 +74,7 @@ class Painter(QObject):
 
     def __init__(self, user_manager):
         super(Painter, self).__init__()
-        self.user_manager = user_manager
+        self._user_manager = user_manager
 
         self._ida_nav_colorizer = None
         self._nbytes = 0
@@ -85,7 +85,7 @@ class Painter(QObject):
 
         # There is a bug in IDA: with a huge number of segments, all the navbar
         # is colored with the user color. This will be resolved in IDA 7.2.
-        users = self.user_manager.get_users()
+        users = self._user_manager.get_users()
         if users:
             for user in users:
                 # Cursor color
@@ -107,7 +107,7 @@ class Painter(QObject):
         self.refresh()
 
     def get_ea_hint(self, ea):
-        users = self.user_manager.get_users()
+        users = self._user_manager.get_users()
         if not users:
             return None
 
@@ -120,7 +120,7 @@ class Painter(QObject):
 
     def get_bg_color(self, ea):
         # Check if disabled by the user
-        users = self.user_manager.get_users()
+        users = self._user_manager.get_users()
         if not users:
             return None
 

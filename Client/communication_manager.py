@@ -3,6 +3,7 @@ import win32con
 import win32api
 import win32gui
 import win32process
+import time
 import json
 import argparse
 from Queue import Queue
@@ -65,17 +66,19 @@ def send_data_to_server(data):
 	if PROJECT_ID == -1 or SECRECT_KEY == "":
 		return -1
 	data_to_send_json = json.loads(data)
-	print data_to_send_json
+	data = data_to_send_json["data"]
+	data_to_send_json.pop("data")
+	data_to_send_json.update(data)
 	data_to_send_json["projectId"] = PROJECT_ID
-	request_data = {}
-	request_data["push-data"] = data_to_send_json
+	print data_to_send_json
+	
 	headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
 	if data_to_send_json["event-id"] == START_IDA_ID:
 			requests.post("{0}/{1}".format(BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 	elif data_to_send_json["event-id"] == EXIT_FROM_IDA_ID:
 			requests.post("{0}/{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 	else:
-			requests.post("{0}/{1}".format(BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data, headers=headers, timeout=5)
+			requests.post("{0}/{1}".format(BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data_to_send_json, headers=headers, timeout=5)
 
 def get_last_update_time_from_config():
 	with open(PROJECT_DATA_FILE, 'r') as f:
@@ -122,9 +125,7 @@ def pull_from_server(integrator_window_key):
 	update_the_config_file(data_parsed["curtimestamp"])
 	new_symbols = data_parsed["symbols"]
 	for symbol in new_symbols:
-		print json.dumps(symbol)
 		send_data_to_window(integrator_window_key, SEND_DATA_TO_IDA, json.dumps(symbol))
-
 	logged_users = data_parsed["loggedOn"]
 	for user in logged_users:
 		send_data_to_window(integrator_window_key, SET_LOGGED_USER, json.dumps(user))
@@ -152,8 +153,8 @@ def remove_done_threads():
 def pulling(integrator_window_key):
 	global TIMER_ARRAY
 	def call_to_pull(integrator_window_key):
-		pulling(integrator_window_key)
 		pull_from_server(integrator_window_key)
+		pulling(integrator_window_key)
 	timer_thread = Timer(PULLING_TIME, call_to_pull, args=(integrator_window_key,  ))
 	timer_thread.start()
 	remove_done_timers()
@@ -162,6 +163,7 @@ def pulling(integrator_window_key):
 def keep_alive_op():
 	global TIMER_ARRAY
 	def keep_alive():
+		time.sleep(1.5)
 		keep_alive_op()
 	keep_alive_thread = Timer(KEEP_ALIVE_TIME, keep_alive)
 	keep_alive_thread.start()

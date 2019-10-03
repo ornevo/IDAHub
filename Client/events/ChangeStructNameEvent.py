@@ -8,4 +8,5 @@ class ChangeStructNameEvent(IEvent):
 		self._name = name
 
 	def implement(self):
-		ida_struct.set_struc_name(self._id, self._name)
+		sturc_id = ida_struct.get_struc_id(str(self._id))
+		ida_struct.set_struc_name(sturc_id, self._name)

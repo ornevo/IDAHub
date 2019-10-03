@@ -7,4 +7,5 @@ class DeleteEnumEvent(IEvent):
 		self._id = id_of_enum
 	
 	def implement(self):
-		ida_enum.del_enum(self._id)
+		id_of_enum = ida_enum.get_enum(str(self._id))
+		ida_enum.del_enum(id_of_enum)
