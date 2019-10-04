@@ -12,6 +12,11 @@ const JoinRequestsSchema = Schema({
         ref: Models.UserInProject.name,
         required: true,
     },
+    ownerId: {
+        type: Schema.Types.ObjectId,
+        ref: Models.User.name,
+        required: true,
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: Models.User.name,

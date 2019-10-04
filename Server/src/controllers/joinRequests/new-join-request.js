@@ -32,6 +32,7 @@ const handler = (req, res) => {
         // If here, user is authorized and not already a member
         let jRequest = new JoinRequests();
         jRequest.projectId = req.project._id;
+        jRequest.ownerId = req.project.owner;
         jRequest.userId = req.jwt.id;
         
         jRequest.save((err, _) => {
