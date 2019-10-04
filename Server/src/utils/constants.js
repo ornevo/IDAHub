@@ -11,6 +11,9 @@ export const Models = {
     UserInProject: {
         name: "UserInProject"
     },
+    JoinRequests: {
+        name: "JoinRequests"
+    },
     Modification: {
         name: "Modification"
     },

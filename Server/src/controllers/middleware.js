@@ -45,7 +45,7 @@ export const validateProjectId = () => function(req, res, next){
             return;
         }
         // If not found
-        if(!project._id) {
+        if(!project || !project._id) {
             sendJSONResponse(res, "Not found", false, Protocol.Status.NotFoundStatusCode);
             return;
         }
