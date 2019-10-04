@@ -13,41 +13,49 @@ import { NotificationManager } from 'react-notifications';
 
 
 class NotificationSection extends React.Component {
+    wrappedUpdateJoinRequestState(...params) {
+        this.props.pullerUpdateAllFunc();
+        return updateJoinRequestState(...params);
+    }
+
     // Since here is where the user sees the notificatoins, this is where we update the server they have been seen
     componentDidMount() {
         // Notify seen approved requests
         this.props.sentRequests.forEach(req => {
             if(req.approved && !req.seenByRequester)
-                updateJoinRequestState(req.id, this.props.authToken, { approveSeenByRequester: true })
+                this.wrappedUpdateJoinRequestState(req.id, this.props.authToken, { approveSeenByRequester: true })
                     .catch(() => undefined);
         });
 
         // Notify seen join requests
         this.props.pendingRequests.forEach(req => {
             if(!req.readByOwner)
-                updateJoinRequestState(req.id, this.props.authToken, { readByOwner: true })
+                this.wrappedUpdateJoinRequestState(req.id, this.props.authToken, { readByOwner: true })
                     .catch(() => undefined);
         })
     }
 
     onRequestApprove(request) {
-        updateJoinRequestState(request.id, this.props.authToken, { readByOwner: true, approved: true })
+        this.wrappedUpdateJoinRequestState(request.id, this.props.authToken, { readByOwner: true, approved: true })
             .then(() => NotificationManager.success("Approved request"))
             .catch(err => NotificationManager.error(err.body || err.toString()));
     }
 
     onRequestDismiss(request) {
-        updateJoinRequestState(request.id, this.props.authToken, { readByOwner: true, dismissed: true })
+        this.wrappedUpdateJoinRequestState(request.id, this.props.authToken, { readByOwner: true, dismissed: true })
             .then(() => NotificationManager.success("Dismissed request"))
             .catch(err => NotificationManager.error(err.body || err.toString()));
     }
 
     onApproveDismiss(sentRequest) {
-        updateJoinRequestState(sentRequest.id, this.props.authToken, { approveReadByRequester: true })
+        this.wrappedUpdateJoinRequestState(sentRequest.id, this.props.authToken, { approveReadByRequester: true })
             .catch(err => NotificationManager.error(err.body || err.toString()));
     }
 
     formatRequestNotif(joinRequest) {
+        if(!joinRequest.requester)
+            console.log(joinRequest);
+        
         return (
             <ListItem key={joinRequest.id} dense button className="RequestNotif-row">
                 {/* Approve button */}
@@ -132,6 +140,7 @@ NotificationSection.propTypes = {
     authToken: PropTypes.string.isRequired,
     sentRequests: PropTypes.array.isRequired,
     pendingRequests: PropTypes.array.isRequired,
+    pullerUpdateAllFunc: PropTypes.func.isRequired
 }
 
 

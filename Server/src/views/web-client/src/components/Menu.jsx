@@ -91,7 +91,7 @@ class Menu extends Component {
         const accountLinksWhenLoggedIn = [
             (<Link className={ menuItemsClass } to="#" key="LoggedoutMenuItem-1" onClick={() => { this.onNewAuthToken(false); }}>Sign out</Link>),
             (
-                <SentRequestsContext.Consumer>
+                <SentRequestsContext.Consumer key="SentRequestsContext.Consumer">
                     { sentRequests =>
                         <PendingRequestsContext.Consumer>
                             { pendingRequests => {

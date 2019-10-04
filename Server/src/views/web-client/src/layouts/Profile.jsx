@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Redirect } from "react-router-dom";
 import { Types } from "mongoose";
 import { NotificationManager } from "react-notifications";
@@ -14,7 +15,7 @@ import ProjectsList from '../components/ProjectsList';
 import NotificationSection from "../components/NotificationSection";
 
 
-export default class ProfileLayout extends React.Component {
+class ProfileLayout extends React.Component {
     static contextType = CredContext;
 
     constructor(props) {
@@ -114,6 +115,7 @@ export default class ProfileLayout extends React.Component {
                                     <PendingRequestsContext.Consumer>
                                         { pendingRequests =>
                                             <NotificationSection 
+                                                pullerUpdateAllFunc={this.props.pullerUpdateAllFunc}
                                                 sentRequests={sentRequests}
                                                 pendingRequests={pendingRequests}
                                                 authToken={this.context}
@@ -142,3 +144,16 @@ export default class ProfileLayout extends React.Component {
         );
     }
 }
+
+
+ProfileLayout.propTypes = {
+    pullerUpdateAllFunc: PropTypes.func.isRequired
+}
+
+
+ProfileLayout.defaultProps = {
+    pullerUpdateAllFunc: () => console.log("Tried to force update")
+}
+
+
+export default ProfileLayout;

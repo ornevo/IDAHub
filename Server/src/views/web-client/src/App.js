@@ -38,6 +38,8 @@ const App = (props) => {
   const [sentRequests, setSentRequests] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
 
+  const pullerRef = React.createRef();
+
   // This returns a component that redirects to '/' if not authenticated, but returns component otherwise
   function __authReqWrapper(component) {
     return (
@@ -58,6 +60,12 @@ const App = (props) => {
     }
   }
 
+  function updateAll() {
+    if(pullerRef.current)
+      pullerRef.current.updateAll();
+  }
+
+
   function setAuthToken(newToken) {
     deleteAllCookies();
 
@@ -65,6 +73,8 @@ const App = (props) => {
       setCookie('authToken', newToken);
     else
       setCookie('authToken', '');
+
+    updateAll();
   }
 
   return (
@@ -73,6 +83,7 @@ const App = (props) => {
         {/* CssBaseline unifies the style to be consistent */}
         <CssBaseline />
         <Puller 
+          ref={pullerRef}
           authToken={authToken}
           currentSentRequestsList={sentRequests}
           updateSentRequestsList={setSentRequests}
@@ -96,8 +107,12 @@ const App = (props) => {
                     {/* In order to re-render it on route change since key changes, using this hack: */}
                     {/* Check this out: https://stackoverflow.com/a/39150493/3477857 */}
                     <Route path="/profile/:userId/:username" component={
-                      (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
-                    />
+                      (props) => <ProfileLayout
+                                    key={props.match.params.userId}
+                                    pullerUpdateAllFunc={updateAll.bind(this)}
+                                    {...props} 
+                                  />
+                    } />
 
                     <Route exact path="/project/:projectId" component={
                       (props) => <ProjectLayout key={props.match.params.projectId} {...props} />}

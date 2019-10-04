@@ -9,9 +9,13 @@ import { getSentRequests, getPendingRequests } from "../shared/API";
 
 
 class Puller extends React.Component {
-    componentDidMount() {
+    updateAll() {
         this.updateSentRequests();
         this.updatePendingRequests();
+    }
+
+    componentDidMount() {
+        this.updateAll();
     }
 
     // This sends a request to the server to refresh the list of pending requests for approval
