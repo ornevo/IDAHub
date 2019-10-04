@@ -118,3 +118,11 @@ export const getSentRequests = (userId, authApiKey) => {
         axios.get(URL + "/api/users/" + userId + "/sent-requests", { headers })
     );
 }
+
+export const getPendingRequests = (userId, authApiKey) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.get(URL + "/api/users/" + userId + "/pending-requests", { headers })
+    );
+}

@@ -2,42 +2,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import JWT from 'jsonwebtoken';
-import { JOIN_REQUESTS_UPDATE_INTERVAL } from "../shared/Constants";
+import Equal from 'fast-deep-equal';
 
-import { getSentRequests } from "../shared/API";
+import { JOIN_REQUESTS_UPDATE_INTERVAL } from "../shared/Constants";
+import { getSentRequests, getPendingRequests } from "../shared/API";
 
 
 class Puller extends React.Component {
     componentDidMount() {
         this.updateSentRequests();
+        this.updatePendingRequests();
     }
 
-    // Checking by doing a shallow comparison of all objects
-    areDifferent(current, fetched) {
-        if(current.length !== fetched.length)
-            return true;
-        // If same length, check if all items are the same
-        for (let i = 0; i < current.length; i++) {
-            const curr = current[i];
-            const currFetched = fetched.find(currFetched => currFetched.id === curr.id);
-            
-            if(!currFetched || typeof currFetched !== typeof {})
-                return true;
+    // This sends a request to the server to refresh the list of pending requests for approval
+    updatePendingRequests() {
+        const recall = () => setTimeout(this.updatePendingRequests.bind(this), JOIN_REQUESTS_UPDATE_INTERVAL);;
 
-            // Compare the objects' fields
-            if(Object.keys(curr).length !== Object.keys(currFetched).length)
-                return true;
-            
-            // For each key, compare values
-            const keys = Object.keys(curr);
-            for (let j = 0; j < keys.length; j++) {
-                const k = keys[j];
-                if(curr[k] !== currFetched[k])
-                    return true; 
-            }
+        if(!this.props.authToken) {
+            recall();
+            return;
         }
 
-        return false;
+        const userId = (JWT.decode(this.props.authToken) || {}).id;
+
+        getPendingRequests(userId, this.props.authToken)
+            .then(pendingRequests => {
+                // Check if changed
+                if(!Equal(this.props.currentPendingRequestsList, pendingRequests))
+                    this.props.updatePendingRequestsList(pendingRequests);
+            }).finally(() => recall());
     }
 
     // This sends a request to the server to refresh the list of requests
@@ -54,7 +47,7 @@ class Puller extends React.Component {
         getSentRequests(userId, this.props.authToken)
             .then(sentRequests => {
                 // Check if changed
-                if(this.areDifferent(this.props.currentSentRequestsList, sentRequests))
+                if(!Equal(this.props.currentSentRequestsList, sentRequests))
                     this.props.updateSentRequestsList(sentRequests);
             }).finally(() => recall());
     }
@@ -66,8 +59,12 @@ class Puller extends React.Component {
 
 Puller.propTypes = {
     authToken: PropTypes.string.isRequired,
+
     updateSentRequestsList: PropTypes.func.isRequired,
-    currentSentRequestsList: PropTypes.array.isRequired
+    currentSentRequestsList: PropTypes.array.isRequired,
+
+    updatePendingRequestsList: PropTypes.func.isRequired,
+    currentPendingRequestsList: PropTypes.array.isRequired
 }
 
 export default Puller;

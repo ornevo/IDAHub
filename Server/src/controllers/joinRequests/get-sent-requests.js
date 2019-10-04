@@ -2,7 +2,7 @@
 import { validateAuthToken } from "../middleware";
 import { sendJSONResponse, createUserDetails } from "../../utils/utils";
 import { Protocol } from "../../utils/constants";
-import { JoinRequests, User } from "../../models/index";
+import { JoinRequests, User, Project } from "../../models/index";
 import { getProjectHeaders } from "../../utils/dbhelpers";
 
 
@@ -25,14 +25,38 @@ const handler = (req, res) => {
             return;
         }
 
-        const retArr = requests.map(r => ({
-            id: r._id.toString(),
-            projectId: r.projectId,
-            approved: r.approved,
-            readByRequester: r.approveReadByRequester
-        }));
+        // For each entry, we need the project name
+        const projectIds = requests.map(r => r.projectId);
 
-        sendJSONResponse(res, retArr, true);
+        Project.find({ _id: { $in: projectIds }}, (err, projects) => {
+            if(err || typeof projects != typeof []) {
+                sendJSONResponse(res, err, false);
+                return;
+            }
+
+            // Create the basic returned arr
+            let retArr = requests.map(r => ({
+                id: r._id.toString(),
+                projectId: r.projectId,
+                approved: r.approved,
+                readByRequester: r.approveReadByRequester
+            }));
+
+            // Richen it by adding the projectName
+            retArr = retArr.map(retElem => {
+                const foundProject = projects.find(p => p._id.toString() === retElem.projectId.toString());
+
+                // Just default if not found...
+                if(!foundProject)
+                    retElem.projectName = "Anonymous";
+                else
+                    retElem.projectName = foundProject.name;
+
+                return retElem;
+            });
+    
+            sendJSONResponse(res, retArr, true);
+        })
     });
 }
 
