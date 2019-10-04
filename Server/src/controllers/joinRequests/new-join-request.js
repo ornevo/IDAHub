@@ -24,23 +24,39 @@ const handler = (req, res) => {
             return;
         }
 
+        // If already contributor, don't send request
         if(user) {
             sendJSONResponse(res, "User already contributor of the project", false);
             return;
         }
 
-        // If here, user is authorized and not already a member
-        let jRequest = new JoinRequests();
-        jRequest.projectId = req.project._id;
-        jRequest.ownerId = req.project.owner;
-        jRequest.userId = req.jwt.id;
-        
-        jRequest.save((err, _) => {
-            if(err)
+        // Make sure the user hasn't sent a request already
+        JoinRequests.findOne({ projectId: req.project._id, userId: req.jwt.id }, (err, previousRequest) => {
+            if(err) {
                 sendJSONResponse(res, err, false);
-            else
-                sendJSONResponse(res, "", true);
-        });
+                return;
+            }
+    
+            // If already sent requestm no matter the status of it, don't allow to resent.
+            if(previousRequest) {
+                sendJSONResponse(res, "Already sent a request.", false);
+                return;
+            }
+    
+            // If here, user is authorized and not already a member
+            let jRequest = new JoinRequests();
+            jRequest.projectId = req.project._id;
+            jRequest.ownerId = req.project.owner;
+            jRequest.userId = req.jwt.id;
+            
+            jRequest.save((err, _) => {
+                if(err)
+                    sendJSONResponse(res, err, false);
+                else
+                    sendJSONResponse(res, "", true);
+            });
+        })
+
     })
 }
 

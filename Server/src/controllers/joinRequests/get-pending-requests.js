@@ -41,7 +41,7 @@ const handler = (req, res) => {
             }
 
             // Get user-details of requester
-            User.find({ _id: { $in: requestersIds}}, (err, requesters) => {
+            User.find({ _id: { $in: requestersIds } }, (err, requesters) => {
                 if(err || !requesters || typeof requesters !== typeof []) {
                     sendJSONResponse(res, err, false);
                     return;
