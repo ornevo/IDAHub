@@ -85,10 +85,10 @@ class Project extends React.Component {
     }
 
     // Creates a DOM element representing the statistic 
-    createStatisticBlock(statName, statValue) {
+    createStatisticBlock(statName, statValue, isBig=false) {
         return (
             <div className="ProjectContainer-statistics-block">
-                <Typography variant="h4">{statName}</Typography>
+                <Typography variant={isBig ? "h4" : "h5"}>{statName}</Typography>
                 <CountUp end={statValue} />
             </div>
         )
@@ -135,10 +135,10 @@ class Project extends React.Component {
                     
                     {/* Description */}
                     <Typography variant="h4" style={{marginBottom: "10px"}}>Description</Typography>
-                    <Typography variant="body2">{softenedProject.description}</Typography>
+                    <Typography variant="body1">{softenedProject.description}</Typography>
 
                     {/* Statistics */}
-                    { this.createStatisticBlock("Number of Modifications", this.state.statistics.modifications) }
+                    { this.createStatisticBlock("Number of Modifications", this.state.statistics.modifications, true) }
                     <div className="ProjectContainer-small-statistics">
                         { this.createStatisticBlock("Functions", this.state.statistics.functions) }
                         { this.createStatisticBlock("Variables", this.state.statistics.variables) }

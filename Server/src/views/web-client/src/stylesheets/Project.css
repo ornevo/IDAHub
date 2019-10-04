@@ -19,7 +19,7 @@
 .ProjectContainer-statistics-block {
     padding-top: 30px;
     text-align: center;
-    font-size: 18px;
+    font-size: 1rem;
 }
 
 @media (max-width: 800px) {
