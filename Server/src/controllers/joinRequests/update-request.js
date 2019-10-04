@@ -52,7 +52,7 @@ const handler = (req, res) => {
         // Only the owner can update whether we read the request, and only the owner can dismiss / approve 
         if(request.readByOwner !== newState.readByOwner || request.approved !== newState.approved || request.dismissed !== newState.dismissed)
             if(req.jwt.id !== request.ownerId.toString()) {
-                sendJSONResponse(res, "Only project owner can change request owner-read status and dismiss/approve status.", Protocol.Status.UnauthorizedStatusCode);
+                sendJSONResponse(res, "Only project owner can change request owner-read status and dismiss / approve status.", Protocol.Status.UnauthorizedStatusCode);
                 return;
             }
 
