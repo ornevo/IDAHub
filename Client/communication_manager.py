@@ -56,6 +56,8 @@ def message_handler(window_handler, msg, wParam, lParam):
 		USERNAME = data["username"]
 		SECRECT_KEY = data["token"]
 	elif wParam == KILL_COMMUNICATION_MANAGER_MESSAGE_ID:
+		headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
+		requests.post("{0}/{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 		print "Kill start"
 		kill()
 	elif wParam == CHANGE_BASE_URL:
