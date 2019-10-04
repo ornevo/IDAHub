@@ -147,7 +147,7 @@ class Project extends React.Component {
         }
 
         return (
-            <Page title={softenedProject.name || "Invalid"}>
+            <Page title={softenedProject.name || "Loading..."}>
                 { pageContent }
             </Page>
         )
