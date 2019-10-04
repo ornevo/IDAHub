@@ -109,7 +109,7 @@ const handler = (req, res) => {
                     }));
                     Modification.find({
                         timestamp: {
-                            $gt: lastupdate
+                            $gte: lastupdate
                         },
                         projectId: projId
                     }, (err, foundDocs) => {
