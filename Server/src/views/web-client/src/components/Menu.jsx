@@ -5,7 +5,7 @@ import ResponsiveMenu from 'react-responsive-navbar';
 import Container from '@material-ui/core/Container';
 import JWT from "jsonwebtoken";
 
-import { CredContext } from "../shared/Contexts";
+import { CredContext, SentRequestsContext, PendingRequestsContext } from "../shared/Contexts";
 
 import LoginModalContent from "../modals-contents/LoginModalContent";
 import SignupModalContent from "../modals-contents/SignupModalContent";
@@ -90,7 +90,25 @@ class Menu extends Component {
         // Either login/signup buttons, or a logout links
         const accountLinksWhenLoggedIn = [
             (<Link className={ menuItemsClass } to="#" key="LoggedoutMenuItem-1" onClick={() => { this.onNewAuthToken(false); }}>Sign out</Link>),
-            (<Link to={"/profile/" + userId + "/" + username} key="LoggedoutMenuItem-2"> <Avatar variant="menu" username={ username } /> </Link> )
+            (
+                <SentRequestsContext.Consumer>
+                    { sentRequests =>
+                        <PendingRequestsContext.Consumer>
+                            { pendingRequests => {
+                                const unreadRequest = pendingRequests.find(req => !req.readByOwner);
+                                const unreadApprovment = sentRequests.find(req => req.approved && !req.seenByRequester);
+                                const haveNotification = (unreadRequest || unreadApprovment) !== undefined;
+                                return (
+                                    <Link to={"/profile/" + userId + "/" + username} key="LoggedoutMenuItem-2">
+                                        <Avatar variant="menu" username={ username } showNotification={haveNotification} />
+                                    </Link>
+                                );
+                            }}
+                        </PendingRequestsContext.Consumer>
+                    }
+                </SentRequestsContext.Consumer>
+                                
+            )
         ];
         const accountLinksWhenLoggedOut = [
             (<Link className={ menuItemsClass } to="#" key="LoggedInMenuItem-1" onClick={_ => this.setState({loginModalOpen: true})}> Login </Link>),

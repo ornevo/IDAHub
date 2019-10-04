@@ -31,7 +31,7 @@ function stringToColor(string) {
     return BG_COLORS[hashStr(string) % BG_COLORS.length];
 }
 
-const Avatar = ({ username, variant }) => {
+const Avatar = ({ username, variant, showNotification }) => {
     // decide the color consistently according to the username
     const [background, fontColor] = stringToColor(username);
     
@@ -60,9 +60,14 @@ const Avatar = ({ username, variant }) => {
         throw new Error("Bad Avatar variant.");
     }
 
+    const NotificationBlink = (
+        <div className={"NotificationAvatarBlink GradientBackground " + (showNotification ? "" : "NotificationAvatarBlink-invisible")}></div>
+    )
+
     return (
         <div style={containerStyle} >
             <GoPerson />
+            { NotificationBlink }
         </div>
     );
 }
@@ -70,12 +75,14 @@ const Avatar = ({ username, variant }) => {
 
 Avatar.propTypes = {
     username: PropTypes.string.isRequired,
-    variant: PropTypes.oneOf(["menu", "chip", "listItem"])
+    variant: PropTypes.oneOf(["menu", "chip", "listItem"]),
+    showNotification: PropTypes.bool
 }
 
 Avatar.defaultProps = {
     username: 'default',
-    variant: "menu"
+    variant: "menu",
+    showNotification: false
 }
 
 

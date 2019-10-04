@@ -125,14 +125,14 @@ export default class ProfileLayout extends React.Component {
                         )                     
                     }
 
-                    <Typography variant="h4">Owned Projects</Typography>
+                    <Typography variant="h4" style={{textAlign: 'center'}}>Owned Projects</Typography>
                     {this.state.loadedProjects ?
                         <ProjectsList projects={ownedProjects} />
                         : <Loader />}
 
                     <br />
 
-                    <Typography variant="h4">Contributor Projects</Typography>
+                    <Typography variant="h4" style={{textAlign: 'center'}}>Contributor Projects</Typography>
                     {this.state.loadedProjects ?
                         <ProjectsList projects={contributingProjects} />
                         : <Loader />}
