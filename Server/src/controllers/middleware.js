@@ -77,6 +77,8 @@ export const validateAuthToken = (requireAuth = true) => {
         // Get the http header raw string value 
         let autherizationHeader = String(req.get('authorization'));
         if(!autherizationHeader || autherizationHeader.split(" ").length != 2) {
+            console.log("A", autherizationHeader);
+            
             failValidation(req, res, next);
             return;
         }
@@ -84,6 +86,8 @@ export const validateAuthToken = (requireAuth = true) => {
         // Extract the method and token from it
         const [scheme, token] = autherizationHeader.split(" ");
         if(scheme != Protocol.httpAuthorizationScheme || !token) {
+            console.log("B", scheme, token);
+
             failValidation(req, res, next);
             return;
         }
@@ -91,9 +95,14 @@ export const validateAuthToken = (requireAuth = true) => {
         // Validate the token
         const decodedJWT = verifyJWTToken(token);
         if(!decodedJWT) {
+            console.log("C", token);
+            
             failValidation(req, res, next);
             return;
         }
+
+        console.log("D...");
+        
 
         // And finally, once validated and decoded, assign to the request
         req.jwt = decodedJWT;

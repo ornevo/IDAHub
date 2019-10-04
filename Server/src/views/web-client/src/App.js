@@ -1,18 +1,20 @@
 /* This contains the overall, cross-page website look and router configuration */
 
 /* React imports */
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import { CredContext } from "./shared/Contexts";
+import { CredContext, SentRequestsContext } from "./shared/Contexts";
 import { CustomMuiTheme } from "./shared/Constants";
 import { NotificationContainer } from "react-notifications";
 import { useCookies } from 'react-cookie';
 
 /* Custom components */
 import Menu from "./components/Menu";
+
+import Puller from "./components/Puller";
 
 import HomepageLayout from "./layouts/homepage";
 import NewProjectLayout from "./layouts/NewProject";
@@ -32,6 +34,7 @@ import BackgroundCyberVideo from './components/BackgroundCyberVideo';
 
 const App = (props) => {
   const [{ authToken }, setCookie] = useCookies(['authToken']);
+  const [sentRequests, setSentRequests] = useState([]);
 
   // This returns a component that redirects to '/' if not authenticated, but returns component otherwise
   function __authReqWrapper(component) {
@@ -67,39 +70,46 @@ const App = (props) => {
       <MuiThemeProvider theme={CustomMuiTheme}>
         {/* CssBaseline unifies the style to be consistent */}
         <CssBaseline />
+        <Puller 
+          authToken={authToken}
+          currentSentRequestsList={sentRequests}
+          updateSentRequestsList={setSentRequests}
+        />
         
         {/* A context to hold authentication token if logged in */}
         <CredContext.Provider value={authToken}>
-          <Router>
+          <SentRequestsContext.Provider value={sentRequests}>
+            <Router>
 
-            <Menu setAuthToken={setAuthToken}/>
-            <div className="Full-screen-container GradientBackground">
-              <BackgroundCyberVideo />
+              <Menu setAuthToken={setAuthToken}/>
+              <div className="Full-screen-container GradientBackground">
+                <BackgroundCyberVideo />
 
-              <Switch>
-                <Route exact path="/" component={HomepageLayout} />
-                <Route exact path="/download" component={DownloadLayout} />
-                {/* In order to re-render it on route change since key changes, using this hack: */}
-                {/* Check this out: https://stackoverflow.com/a/39150493/3477857 */}
-                <Route path="/profile/:userId/:username" component={
-                  (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
-                />
+                <Switch>
+                  <Route exact path="/" component={HomepageLayout} />
+                  <Route exact path="/download" component={DownloadLayout} />
+                  {/* In order to re-render it on route change since key changes, using this hack: */}
+                  {/* Check this out: https://stackoverflow.com/a/39150493/3477857 */}
+                  <Route path="/profile/:userId/:username" component={
+                    (props) => <ProfileLayout key={props.match.params.userId} {...props} />}
+                  />
 
-                <Route exact path="/project/:projectId" component={
-                  (props) => <ProjectLayout key={props.match.params.projectId} {...props} />}
-                />
+                  <Route exact path="/project/:projectId" component={
+                    (props) => <ProjectLayout key={props.match.params.projectId} {...props} />}
+                  />
 
-                <Route exact path="/new-project" component={__authReqWrapper(NewProjectLayout)} />
-                {/* See notes above the profile route */}
-                <Route path="/search/:query" component={
-                  props => <SearchLayout key={props.match.params.query} {...props} />
-                } />
+                  <Route exact path="/new-project" component={__authReqWrapper(NewProjectLayout)} />
+                  {/* See notes above the profile route */}
+                  <Route path="/search/:query" component={
+                    props => <SearchLayout key={props.match.params.query} {...props} />
+                  } />
 
-                {/* 404 back to main */}
-                <Route component={() => <Redirect from='*' to='/' />} />
-              </Switch>
-            </div>
-          </Router>
+                  {/* 404 back to main */}
+                  <Route component={() => <Redirect from='*' to='/' />} />
+                </Switch>
+              </div>
+            </Router>
+          </SentRequestsContext.Provider>
         </CredContext.Provider>
 
         {/* To display notifications */}

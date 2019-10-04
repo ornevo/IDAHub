@@ -1,5 +1,6 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 
+export const JOIN_REQUESTS_UPDATE_INTERVAL = 5000;
 export const MainColor = "#2979ff";
 export const CustomMuiTheme = createMuiTheme({
     typography: {

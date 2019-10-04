@@ -102,3 +102,19 @@ export const projectsSearch = (query, authApiKey=null) => {
         axios.get(URL + "/api/projects", { params: { query }, headers })
     );
 }
+
+export const sendJoinRequest = (projectId, authApiKey) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.post(URL + "/api/projects/" + projectId + "/join-request", {}, { headers })
+    );
+}
+
+export const getSentRequests = (userId, authApiKey) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.get(URL + "/api/users/" + userId + "/sent-requests", { headers })
+    );
+}
