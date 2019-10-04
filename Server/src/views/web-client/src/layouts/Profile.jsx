@@ -3,12 +3,14 @@ import { Redirect } from "react-router-dom";
 import { Types } from "mongoose";
 import { NotificationManager } from "react-notifications";
 import { Typography } from '@material-ui/core';
+import JWT from 'jsonwebtoken';
 
 import Page from '../components/Page';
 import { CredContext } from "../shared/Contexts";
 import { getUserProjects } from "../shared/API";
 import Loader from "../components/Loader";
 import ProjectsList from '../components/ProjectsList';
+import NotificationSection from "../components/NotificationSection";
 
 
 export default class ProfileLayout extends React.Component {
@@ -67,6 +69,18 @@ export default class ProfileLayout extends React.Component {
         this.fetchProjects();
     }
 
+    isViewingSelfProfile() {
+        if(!this.context)
+            return false;
+
+        const decodedToken = JWT.decode(this.context);
+        
+        if(!decodedToken)
+            return false;
+
+        return decodedToken.id === this.state.userId;
+    }
+
     render() {
         // If no id, route back
         if(!this.state.isValidUser)
@@ -87,9 +101,19 @@ export default class ProfileLayout extends React.Component {
                 console.log("Something weird in the user owner's projects: Some are either owned by him nor he is contributing to them. Please check.");
         }
 
+        const isViewingSelf = this.isViewingSelfProfile();
+
         return (
             <Page title={this.state.username + "'s Profile"}>
-                <div>
+                <div className={isViewingSelf ? "SelfProfileContainer" : ""}>
+                    {
+                        isViewingSelf && (
+                            <NotificationSection 
+                                authToken={this.context}
+                            />
+                        )                     
+                    }
+                    
                     <Typography variant="h4">Owned Projects</Typography>
                     {this.state.loadedProjects ?
                         <ProjectsList projects={ownedProjects} />
