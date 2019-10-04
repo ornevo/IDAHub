@@ -79,8 +79,6 @@ class SearchLayout extends React.Component {
     }
 
     render() {
-        console.log("HERE");
-
         return (
             <Page title="Search Results">
                 <div>
