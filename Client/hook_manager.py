@@ -241,7 +241,6 @@ class LiveHook(ida_idp.IDB_Hooks):
 	def ti_changed(self, ea, type, fnames):
 		if not shared.PAUSE_HOOK:
 			log("Ti changed: {0} {1} {2}".format(str(ea), str(type), str(fnames)))
-			flags_of_address = idc.GetFlags(ea)
 			pass_to_manager(ChangeTypeEvent(ea, ida_typeinf.idc_get_type_raw(ea),is_make_data = False))
 		return ida_idp.IDB_Hooks.ti_changed(self, ea, type, fnames)
 

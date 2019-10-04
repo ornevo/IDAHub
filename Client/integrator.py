@@ -87,11 +87,15 @@ def create_event_from_dict(json_dict):
 	elif event_id == constants.SET_COMMENT_ID: 
 		return ChangeCommentEvent(json_dict["linearAddress"], str(json_dict["value"]) ,str(json_dict["commentType"]), json_dict["name"])
 	elif event_id == constants.CHANGE_TYPE_ID: 
-		if ":" in str(json_dict["variableType"]):
-			ea, flags, tid, size = str(json_dict["variableType"]).split(':')
-			return ChangeTypeEvent(int(json_dict["linearAddress"]), int(flags), int(tid), int(size), True)
-		else:	
-			return ChangeTypeEvent(json_dict["linearAddress"], str(json_dict["variableType"]), is_make_data = False)
+		try:
+			type_string = str(json_dict["variableType"])
+			if ":" in type_string:
+				ea, flags, tid, size = type_string.split(':')
+				return ChangeTypeEvent(int(json_dict["linearAddress"]), int(flags), int(tid), int(size), True)
+			else:	
+				return ChangeTypeEvent(json_dict["linearAddress"], type_string, is_make_data = False)
+		except UnicodeEncodeError:
+			return ChangeTypeEvent(json_dict["linearAddress"], json_dict["variableType"], is_make_data = False)
 	elif event_id == constants.NEW_FUNCTION_ID: 
 		return NewFunctionEvent(json_dict["linearAddress"],json_dict["value"])
 	elif event_id == constants.UNDEFINE_DATA_ID: 
