@@ -17,7 +17,7 @@ const JoinRequestsSchema = Schema({
         ref: Models.User.name,
         required: true,
     },
-    userId: {
+    userId: { // User id of the requester
         type: Schema.Types.ObjectId,
         ref: Models.User.name,
         required: true,
