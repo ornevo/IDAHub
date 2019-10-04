@@ -22,6 +22,12 @@
   top: 0;
   outline: none !important;
   z-index: -9000;
+  animation: fadein 2s;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .GradientBackground {

@@ -2,8 +2,8 @@ import React from 'react';
 import BackVideo from "../res/cyberBackVideo.webm";
 
 
-const VID_WIDTH = 1368;
-const VID_HEIGHT = 1320;
+const VID_WIDTH = 252;
+const VID_HEIGHT = 308;
 
 
 export default class BackgroundCyberVideo extends React.Component {
