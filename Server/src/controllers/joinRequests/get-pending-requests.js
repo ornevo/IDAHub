@@ -68,8 +68,7 @@ const handler = (req, res) => {
                         requester: createUserDetails(currRequesterObject.username, currRequesterObject._id.toString()),
                         readByOwner: request.readByOwner,
                         approved: request.approved,
-                        dismissed: request.dismissed,
-                        approveReadByRequester: request.approveReadByRequester
+                        dismissed: request.dismissed
                     });
                 });
 
