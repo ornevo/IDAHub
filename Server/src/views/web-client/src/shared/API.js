@@ -126,3 +126,27 @@ export const getPendingRequests = (userId, authApiKey) => {
         axios.get(URL + "/api/users/" + userId + "/pending-requests", { headers })
     );
 }
+
+export const updateJoinRequestState = (requestId, authApiKey, updateFields={}) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    // rename some fields
+    if(updateFields.readByOwner !== null) {
+        updateFields['read-by-owner'] = updateFields.readByOwner;
+        delete updateFields.readByOwner
+    }
+
+    if(updateFields.approveSeenByRequester !== null) {
+        updateFields['approve-seen-by-requester'] = updateFields.approveSeenByRequester;
+        delete updateFields.approveSeenByRequester
+    }
+
+    if(updateFields.approveReadByRequester !== null) {
+        updateFields['approve-read-by-requester'] = updateFields.approveReadByRequester;
+        delete updateFields.approveReadByRequester
+    }
+
+    return _wrap_api_promise(
+        axios.post(URL + "/api/join-requests/" + requestId, updateFields, { headers })
+    );
+}

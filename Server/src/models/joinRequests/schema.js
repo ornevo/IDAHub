@@ -38,7 +38,14 @@ const JoinRequestsSchema = Schema({
         required: true,
         default: false
     },
+    // This is true when the requester "dismissed" an approval message
     approveReadByRequester: {
+        type: Schema.Types.Boolean,
+        required: true,
+        default: false
+    },
+    // This is true when the requester saw the approval message
+    approveSeenByRequester: {
         type: Schema.Types.Boolean,
         required: true,
         default: false

@@ -34,12 +34,16 @@ const handler = (req, res) => {
         
         // If here, found request. The OR-ing (||) with the original request both allows the client to emit values
         //  and disables flipping a true back to a false.
-        const newState = {
+        let newState = {
             readByOwner: req.body['read-by-owner'] || request.readByOwner,
             approved: req.body['approved'] || request.approved,
             dismissed: req.body['dismissed'] || request.dismissed,
-            approveReadByRequester: req.body['approve-read-by-requester'] || request.approveReadByRequester
+            approveReadByRequester: req.body['approve-read-by-requester'] || request.approveReadByRequester,
+            approveSeenByRequester: req.body['approve-seen-by-requester'] || request.approveSeenByRequester,
         }
+
+        // Must have seen if dismissed as read
+        newState.approveSeenByRequester = newState.approveSeenByRequester || newState.approveReadByRequester;
 
         // Make sure there's no funny business
         if(Object.values(newState).find(v => typeof v !== typeof false && typeof v !== typeof undefined)) {
@@ -56,8 +60,8 @@ const handler = (req, res) => {
                 return;
             }
 
-        // Only the requester can update whether he read the approve
-        if(request.approveReadByRequester !== newState.approveReadByRequester)
+        // Only the requester can update whether he read / seen the approve
+        if(request.approveReadByRequester !== newState.approveReadByRequester || request.approveSeenByRequester !== newState.approveSeenByRequester)
             if(req.jwt.id !== request.userId.toString()) {
                 sendJSONResponse(res, "Only request initiator can change requester approve-read status.", Protocol.Status.UnauthorizedStatusCode);
                 return;
@@ -67,11 +71,7 @@ const handler = (req, res) => {
         const isApproveUpdate = !request.approved && newState.approved;
 
         // We can now safely apply update.
-        request.readByOwner = newState.readByOwner;
-        request.approved = newState.approved;
-        request.dismissed = newState.dismissed;
-        request.approveReadByRequester = newState.approveReadByRequester;
-        request.save((err, newRequest) => {
+        JoinRequests.updateOne({_id: request._id}, newState, (err, newRequest) => {
             if(err || !newRequest) {
                 sendJSONResponse(res, err, false);
                 return;

@@ -5,6 +5,7 @@ import { NotificationManager } from "react-notifications";
 import { Typography } from '@material-ui/core';
 import JWT from 'jsonwebtoken';
 
+import { SentRequestsContext, PendingRequestsContext } from "../shared/Contexts";
 import Page from '../components/Page';
 import { CredContext } from "../shared/Contexts";
 import { getUserProjects } from "../shared/API";
@@ -108,12 +109,22 @@ export default class ProfileLayout extends React.Component {
                 <div className={isViewingSelf ? "SelfProfileContainer" : ""}>
                     {
                         isViewingSelf && (
-                            <NotificationSection 
-                                authToken={this.context}
-                            />
+                            <SentRequestsContext.Consumer>
+                                { sentRequests =>
+                                    <PendingRequestsContext.Consumer>
+                                        { pendingRequests =>
+                                            <NotificationSection 
+                                                sentRequests={sentRequests}
+                                                pendingRequests={pendingRequests}
+                                                authToken={this.context}
+                                            />
+                                        }
+                                    </PendingRequestsContext.Consumer>
+                                }
+                            </SentRequestsContext.Consumer>
                         )                     
                     }
-                    
+
                     <Typography variant="h4">Owned Projects</Typography>
                     {this.state.loadedProjects ?
                         <ProjectsList projects={ownedProjects} />

@@ -39,7 +39,8 @@ const handler = (req, res) => {
                 id: r._id.toString(),
                 projectId: r.projectId,
                 approved: r.approved,
-                readByRequester: r.approveReadByRequester
+                readByRequester: r.approveReadByRequester,
+                seenByRequester: r.approveSeenByRequester
             }));
 
             // Richen it by adding the projectName

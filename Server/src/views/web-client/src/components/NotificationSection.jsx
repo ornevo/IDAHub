@@ -8,26 +8,43 @@ import IconButton from '@material-ui/core/IconButton';
 import { FaCheckCircle, FaTimesCircle, FaStream } from 'react-icons/fa';
 
 import UserChip from './UserChip';
-import { SentRequestsContext, PendingRequestsContext } from "../shared/Contexts";
+import { updateJoinRequestState } from "../shared/API";
+import { NotificationManager } from 'react-notifications';
 
 
 class NotificationSection extends React.Component {
-    genNotificationClickHandler(notificationObject) {
-        return function() {
-            console.log("Clicked: ", notificationObject);
-        }
+    // Since here is where the user sees the notificatoins, this is where we update the server they have been seen
+    componentDidMount() {
+        // Notify seen approved requests
+        this.props.sentRequests.forEach(req => {
+            if(req.approved && !req.seenByRequester)
+                updateJoinRequestState(req.id, this.props.authToken, { approveSeenByRequester: true })
+                    .catch(() => undefined);
+        });
+
+        // Notify seen join requests
+        this.props.pendingRequests.forEach(req => {
+            if(!req.readByOwner)
+                updateJoinRequestState(req.id, this.props.authToken, { readByOwner: true })
+                    .catch(() => undefined);
+        })
     }
 
     onRequestApprove(request) {
-        console.log("Approved " + request.id);
+        updateJoinRequestState(request.id, this.props.authToken, { readByOwner: true, approved: true })
+            .then(() => NotificationManager.success("Approved request"))
+            .catch(err => NotificationManager.error(err.body || err.toString()));
     }
 
     onRequestDismiss(request) {
-        console.log("Dismissed " + request.id);
+        updateJoinRequestState(request.id, this.props.authToken, { readByOwner: true, dismissed: true })
+            .then(() => NotificationManager.success("Dismissed request"))
+            .catch(err => NotificationManager.error(err.body || err.toString()));
     }
 
     onApproveDismiss(sentRequest) {
-        console.log("Marked as read approval " + sentRequest.id);
+        updateJoinRequestState(sentRequest.id, this.props.authToken, { approveReadByRequester: true })
+            .catch(err => NotificationManager.error(err.body || err.toString()));
     }
 
     formatRequestNotif(joinRequest) {
@@ -98,16 +115,12 @@ class NotificationSection extends React.Component {
 
                 <Typography variant="h5">Approved Requests</Typography>
                 <List>
-                    <SentRequestsContext.Consumer>
-                        { sentRequests => sentRequests.filter(s => s.approved).map(this.formatApprovedNotif.bind(this)) }
-                    </SentRequestsContext.Consumer>
+                    { this.props.sentRequests.filter(s => s.approved).map(this.formatApprovedNotif.bind(this)) }
                 </List>
 
                 <Typography variant="h5">Join Requests</Typography>
                 <List>
-                    <PendingRequestsContext.Consumer>
-                        { pendingRequests => pendingRequests.map(this.formatRequestNotif.bind(this)) }
-                    </PendingRequestsContext.Consumer>
+                    { this.props.pendingRequests.map(this.formatRequestNotif.bind(this)) }
                 </List>
             </div>
         );
@@ -116,7 +129,9 @@ class NotificationSection extends React.Component {
 
 
 NotificationSection.propTypes = {
-    authToken: PropTypes.string.isRequired
+    authToken: PropTypes.string.isRequired,
+    sentRequests: PropTypes.array.isRequired,
+    pendingRequests: PropTypes.array.isRequired,
 }
 
 
