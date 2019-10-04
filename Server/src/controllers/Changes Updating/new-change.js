@@ -96,10 +96,6 @@ const handler = (req, res) => {
             newModification.offset = null;
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> Orr changes
     if(!(   (req.body.hasOwnProperty('variable-type') && typeof req.body["variable-type"]=="string") || req.body.hasOwnProperty('variable-type')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
@@ -111,12 +107,7 @@ const handler = (req, res) => {
             newModification.variableType = null;
     }
 
-<<<<<<< HEAD
-
-    if(!((req.body.hasOwnProperty('name') && typeof req.body.name=="string") || req.body.hasOwnProperty('name')==false   )   ){
-=======
-    if(!(   (req.body.hasOwnProperty('name') && typeof req.body.name=="string") || req.body.hasOwnProperty('name')==false   )   ){
->>>>>>> Orr changes
+    if(!((req.body.hasOwnProperty('name') && typeof req.body.name=="string") || req.body.hasOwnProperty('name') == false)) {
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -126,13 +117,8 @@ const handler = (req, res) => {
         else
             newModification.name = null;
     }
-<<<<<<< HEAD
 
-
-    if(!((req.body.hasOwnProperty('id') && typeof req.body.id=="string") || req.body.hasOwnProperty('id')==false   )   ){
-=======
-    if(!(   (req.body.hasOwnProperty('id') && typeof req.body.id=="string") || req.body.hasOwnProperty('id')==false   )   ){
->>>>>>> Orr changes
+    if(!((req.body.hasOwnProperty('id') && typeof req.body.id=="string") || req.body.hasOwnProperty('id') == false)) {
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -142,9 +128,6 @@ const handler = (req, res) => {
         else
             newModification.id = null;
     }
-
-    
-
 
     // check if the user belongs to the project.
     UserInProject.find({ userId: newModification.userId }, (err, foundDocs) => {
