@@ -8,7 +8,6 @@
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files && npm run 'compress-client'",
     "start": "npm run build && forever start --minUptime 1000 --spinSleepTime 1000 ./dist/bin/www",
     "stop": "forever stop ./dist/bin/www"
->>>>>>>  Run node in background
   },
   "dependencies": {
     "babel-cli": "^6.26.0",
