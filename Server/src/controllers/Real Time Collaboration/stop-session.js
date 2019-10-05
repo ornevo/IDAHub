@@ -21,15 +21,26 @@ const validators = [
 // Handler, the route function
 const handler = (req, res) => {
     var mongoose = require('mongoose');
-    var myquery = { projectId: mongoose.Types.ObjectId(req.params['projectId']) , userId: req.jwt.id };
+    var flag=false;
+    var myquery = { projectId: mongoose.Types.ObjectId(req.params['projectId']) , userId: req.jwt.id , endTimestamp:null };
     var newvalue = { $set: {endTimestamp: (Math.floor(new Date().getTime()/1000.0)).toString() } };
+    
+    // check if the user belongs to the project.
+    UserInProject.find({ userId: req.jwt.userId ,projectId: mongoose.Types.ObjectId(req.params['projectId'])}, (err, foundDocs) => {
+        if(err) {
+            sendJSONResponse(res, "error", false);
+            return;
+        }
+    })
+        
     //Update the session document
     Session.updateOne(myquery, newvalue, (err, res) => {
         if (err) {
         sendJSONResponse(res, "error", false);
     return;
-         }
-    });
+        }
+        //})
+    })
     sendJSONResponse(res, "OK", true);
 };
 export default { validators, handler };
