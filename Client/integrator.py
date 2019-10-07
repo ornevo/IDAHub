@@ -44,7 +44,8 @@ def message_handler(window_handler, msg, wParam, lParam):
 		log("Received object: " + str(event_data))
 		shared.PAUSE_HOOK = True
 		event_object.implement()
-		shared.PAUSE_HOOK = False
+		if not shared.MASTER_PAUSE_HOOK:
+			shared.PAUSE_HOOK = False
 	elif wParam == constants.SET_LOGGED_USER:
 		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
 		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
@@ -59,7 +60,7 @@ def message_handler(window_handler, msg, wParam, lParam):
 		shared.COMMUNICATION_MANAGER_WINDOW_ID = event_data["id"]
 		shared.IS_COMMUNICATION_MANAGER_STARTED = True
 		if shared.USERID != -1: #started.
-			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID, "need-to-pull": False}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
 	return True
@@ -142,33 +143,40 @@ class user_manager():
 	def __init__(self):
 		self._users = []
 		self._used_colors = []
+		self.add_logged_user(shared.USERNAME)
 	
 	def add_logged_user(self, user):
-		for user_dict in self._users:
-			if user == user_dict["user"]:
-				return 0
-		color = random.choice(list(set(constants.COLOR_ARRAY) - set(self._used_colors)))
-		self._used_colors.append(color)
-		self._users.append({"user": user, "logged": True, "ea": 0, "color": color})
+		if not shared.MASTER_PAUSE_HOOK:
+			for user_dict in self._users:
+				if user == user_dict["user"]:
+					return 0
+			color = random.choice(list(set(constants.COLOR_ARRAY) - set(self._used_colors)))
+			self._used_colors.append(color)
+			self._users.append({"user": user, "logged": True, "ea": 0, "color": color})
 
 	def change_ea_of_user(self, user, ea):
-		for user_dict in self._users:
-			if  user == shared.USERNAME:
-				continue
-			if user_dict["user"] == user:
-				user_dict["ea"] = ea
-		shared.PAINTER.refresh()
+		if not shared.MASTER_PAUSE_HOOK:
+			for user_dict in self._users:
+				if  user == shared.USERNAME:
+					continue
+				if user_dict["user"] == user:
+					user_dict["ea"] = ea
+			shared.PAINTER.refresh()
 
 	def remove_logged_user(self, user):
-		tmp_arr = []
-		user_color = ""
-		for user_dict in self._users:
-			if user != user_dict["user"]:
-				tmp_arr.append({"user": user_dict["user"], "logged": user_dict["logged"], "ea": user_dict["ea"], "color": user_dict["color"]})
-			else:
-				user_color = user_dict["color"]
-		self._used_colors = list(set(self._used_colors) - set(user_color))
-		self._users = tmp_arr
+		if not shared.MASTER_PAUSE_HOOK:
+			#In the case we get logged of user, that is our's from the last session.
+			if user == shared.USERNAME:
+				return 0
+			tmp_arr = []
+			user_color = ""
+			for user_dict in self._users:
+				if user != user_dict["user"]:
+					tmp_arr.append({"user": user_dict["user"], "logged": user_dict["logged"], "ea": user_dict["ea"], "color": user_dict["color"]})
+				else:
+					user_color = user_dict["color"]
+			self._used_colors = list(set(self._used_colors) - set(user_color))
+			self._users = tmp_arr
 
 	def get_users(self):
 		return self._users

@@ -47,6 +47,11 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 		selector = ProjectSelector(request_project_list())
 		selector.Compile()
 		selector.Execute()
+		if shared.IS_COMMUNICATION_MANAGER_STARTED:
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID, "need-to-pull": shared.MASTER_PAUSE_HOOK}))
+			if shared.MASTER_PAUSE_HOOK:
+				idaapi.register_action(action_manual_pull)
+				idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/Pull from server", "idahub:manual_pull",idaapi.SETMENU_APP)			
 		return ida_idp.IDP_Hooks.ev_newfile(self, fname)
 
 	def ev_oldfile(self, fname):
@@ -54,7 +59,30 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 		selector = ProjectSelector(request_project_list())
 		selector.Compile()
 		selector.Execute()
+		if shared.IS_COMMUNICATION_MANAGER_STARTED:
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID, "need-to-pull": shared.MASTER_PAUSE_HOOK}))
+			if shared.MASTER_PAUSE_HOOK:
+				idaapi.register_action(action_manual_pull)
+				idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/Pull from server", "idahub:manual_pull",idaapi.SETMENU_APP)			
 		return ida_idp.IDP_Hooks.ev_oldfile(self, fname)
+
+
+class PullHandler(idaapi.action_handler_t):
+	def __init__(self):
+		return idaapi.action_handler_t.__init__(self)
+
+	def active(self,ctx):
+		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.MANUAL_PULL_ID, json.dumps({}))
+
+	def update(self,ctx):
+		return idaapi.AST_ENABLE_ALWAYS
+
+action_manual_pull = idaapi.action_desc_t(
+	"idahub:manual_pull",
+	"Pull from server",
+	PullHandler(),
+	"Ctrl+Alt+P"
+)
 
 class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 	flags = idaapi.PLUGIN_HIDE | idaapi.PLUGIN_FIX
@@ -62,6 +90,11 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 	help = " "
 	wanted_name = "Authenticator"
 	wanted_hotkey = ""
+
+	def ready_to_run(self):
+		if shared.MASTER_PAUSE_HOOK:
+			idaapi.register_action(action_manual_pull)
+			idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/Pull from server", "idahub:manual_pull",idaapi.SETMENU_APP)			
 
 	def run(self):
 		pass
@@ -83,11 +116,11 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 			selector.Execute()
 		
 		if shared.IS_COMMUNICATION_MANAGER_STARTED:
-			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID, "need-to-pull": shared.MASTER_PAUSE_HOOK}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
-
-		if not shared.PAUSE_HOOK:
-			pass_to_manager(StartIDAEvent())
+		if not shared.MASTER_PAUSE_HOOK:
+			if not shared.PAUSE_HOOK:
+				pass_to_manager(StartIDAEvent())
 			
 		self._live_hook = LiveHookIDP()
 		self._live_hook.hook()

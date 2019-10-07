@@ -10,9 +10,11 @@ import sys
 import json
 
 LOGIN_PATH = "api/users/token"
+GET_PROJECT_HEADER = "api/projects/{0}"
 GET_PROJECT_CHANGES_PATH = "api/projects/{0}/changes"
 PUSH_DATA_TO_PROJECT  = "api/projects/{0}/push"
 LIST_USER_PROJECT = "api/users/{0}/projects"
+LIST_ALL_PROJECTS = "api/projects"
 START_SESSION = "api/projects/{0}/session/start"
 END_SESSION = "api/projects/{0}/session/stop"
 PROJECT_DATA_FILE = "{0}\\IDAHub\\projects.dat".format(os.getenv("APPDATA"))
@@ -116,6 +118,7 @@ SET_LOGGED_USER = 1402
 SET_LOGGED_OFF_USER = 1403
 CHANGE_BASE_URL = 1404
 SET_COMMUNICATION_MANAGER_ID = 1405
+MANUAL_PULL_ID = 1406
 ## Events id.
 
 CHANGE_FUNCTION_NAME_ID = 1
@@ -146,7 +149,7 @@ DELETE_ENUM_MEMBER_ID = 26
 
 
 ## Settings
-PULLING_TIME = 2.5
+PULLING_TIME = 1.5
 KEEP_ALIVE_TIME = 0.01
 
 ## User colors
