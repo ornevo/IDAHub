@@ -36,10 +36,9 @@ const handler = (req, res) => {
     newModification.userId = a.id;
     newModification.timestamp = (Math.floor(new Date().getTime()/1000.0)).toString();
     newModification.eventId = req.body["event-id"];
-    req.body = JSON.stringify(req.body)
-
+    req.body = JSON.parse(JSON.stringify(req.body))
     //check the rest input
-    if(!((req.body.hasOwnProperty('linear-address') && typeof req.body["linear-address"]=="number") || req.body.hasOwnProperty('linear-address')==false)){
+    if(!((req.body.hasOwnProperty('linear-address') && typeof req.body["linear-address"]=="string") || req.body.hasOwnProperty('linear-address')==false)){
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -49,7 +48,6 @@ const handler = (req, res) => {
         else
             newModification.linearAddress = null;
     }
-
 
     if(!((req.body.hasOwnProperty('value') && typeof req.body.value=="string") || req.body.hasOwnProperty('value')==false   )   ){
         sendJSONResponse(res, "inputError", false);
