@@ -21,6 +21,8 @@ USERNAME_ID = -1
 USERNAME = ""
 PROJECT_ID = -1
 DEBUG = False
+INTEGRATOR_WINDOW_KEY = ""
+NEED_TO_PULL = True
 
 def create_hidden_window():
 	message_map = {win32con.WM_COPYDATA: message_handler}
@@ -44,12 +46,14 @@ def decode_data(lParam):
 	return data.replace("\x00","")
 
 def message_handler(window_handler, msg, wParam, lParam): 
-	global PROJECT_ID, USERNAME, USERNAME_ID, SECRECT_KEY,BASE_URL
+	global PROJECT_ID, USERNAME, USERNAME_ID, SECRECT_KEY,BASE_URL, NEED_TO_PULL
 	if wParam == SEND_DATA_TO_SERVER:
-		Thread(target=send_data_to_server, args=(decode_data(lParam), )).start()
+		if not NEED_TO_PULL:
+			Thread(target=send_data_to_server, args=(decode_data(lParam), )).start()
 	elif wParam == CHANGE_PROJECT_ID:
 		data = json.loads(decode_data(lParam))
 		PROJECT_ID = data["project-id"]
+		NEED_TO_PULL = data["need-to-pull"]
 	elif wParam == CHANGE_USER:
 		data = json.loads(decode_data(lParam))
 		USERNAME_ID = data["id"]
@@ -63,6 +67,8 @@ def message_handler(window_handler, msg, wParam, lParam):
 	elif wParam == CHANGE_BASE_URL:
 		data = json.loads(decode_data(lParam))
 		BASE_URL = data["url"]
+	elif wParam == MANUAL_PULL_ID:
+		pull_from_server(INTEGRATOR_WINDOW_KEY)
 
 def send_data_to_server(data):
 	if PROJECT_ID == -1 or SECRECT_KEY == "":
@@ -108,6 +114,8 @@ def update_the_config_file(current_time):
 		f.write(json.dumps(data))
 	
 def pull_from_server(integrator_window_key):
+	if NEED_TO_PULL:
+		return -1
 	if PROJECT_ID == -1 or SECRECT_KEY == "":
 		return -1
 	params = {"projectId": PROJECT_ID, "lastUpdate": get_last_update_time_from_config()}
@@ -154,24 +162,14 @@ def remove_done_threads():
 
 def pulling(integrator_window_key):
 	global TIMER_ARRAY
-	def call_to_pull(integrator_window_key):
-		pull_from_server(integrator_window_key)
-		pulling(integrator_window_key)
-	timer_thread = Timer(PULLING_TIME, call_to_pull, args=(integrator_window_key,  ))
-	timer_thread.start()
-	remove_done_timers()
-	TIMER_ARRAY.append(timer_thread)
-
-def keep_alive_op():
-	global TIMER_ARRAY
-	def keep_alive():
-		time.sleep(1.5)
-		keep_alive_op()
-	keep_alive_thread = Timer(KEEP_ALIVE_TIME, keep_alive)
-	keep_alive_thread.start()
-	remove_done_timers()
-	remove_done_threads()
-	TIMER_ARRAY.append(keep_alive_thread)
+	if not NEED_TO_PULL:
+		def call_to_pull(integrator_window_key):
+			pull_from_server(integrator_window_key)
+			pulling(integrator_window_key)
+		timer_thread = Timer(PULLING_TIME, call_to_pull, args=(integrator_window_key,  ))
+		timer_thread.start()
+		remove_done_timers()
+		TIMER_ARRAY.append(timer_thread)
 
 def parse_args():
 	parser = argparse.ArgumentParser(description="Puller for the IDA Plugin IReal")
@@ -180,11 +178,11 @@ def parse_args():
 	return args.integrator_window_key
 
 def main(integrator_window_key):
-	global TIMER_ARRAY, WINDOW_HANDLER, SECRECT_KEY, PROJECT_ID
+	global TIMER_ARRAY, WINDOW_HANDLER, SECRECT_KEY, PROJECT_ID, INTEGRATOR_WINDOW_KEY
 	WINDOW_HANDLER = create_hidden_window()
+	INTEGRATOR_WINDOW_KEY = integrator_window_key
 	send_data_to_window(integrator_window_key, SET_COMMUNICATION_MANAGER_ID, json.dumps({"id": WINDOW_HANDLER}))
 	pulling(integrator_window_key)
-	keep_alive_op()
 	win32gui.PumpMessages()
 
 def kill():

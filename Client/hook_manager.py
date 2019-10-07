@@ -55,13 +55,15 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 	def	ev_newfile(self, fname):	
 		log("START")
 		pass_to_manager(StartIDAEvent())
-		shared.PAUSE_HOOK = not ida_auto.auto_is_ok()
+		if not shared.MASTER_PAUSE_HOOK:
+			shared.PAUSE_HOOK = not ida_auto.auto_is_ok()
 		return ida_idp.IDP_Hooks.ev_newfile(self, fname)
 
 	def ev_oldfile(self, fname):
 		log("START")
 		pass_to_manager(StartIDAEvent())
-		shared.PAUSE_HOOK = not ida_auto.auto_is_ok()
+		if not shared.MASTER_PAUSE_HOOK:
+			shared.PAUSE_HOOK = not ida_auto.auto_is_ok()
 		return ida_idp.IDP_Hooks.ev_oldfile(self, fname)
 
 	def ev_get_bg_color(self, color,ea):
@@ -252,7 +254,8 @@ class LiveHook(ida_idp.IDB_Hooks):
 		
 	def auto_empty_finally(self):
 		log("auto finished")
-		shared.PAUSE_HOOK = False
+		if not shared.MASTER_PAUSE_HOOK:
+			shared.PAUSE_HOOK = False
 		return 0
 	
 def pass_to_manager(ev):
@@ -289,14 +292,16 @@ class hook_manager(idaapi.UI_Hooks, idaapi.plugin_t):
 		
 		if idc.GetIdbPath() and ida_auto.auto_is_ok():
 			log("Start")
-			shared.PAUSE_HOOK = False
+			if not shared.MASTER_PAUSE_HOOK:
+				shared.PAUSE_HOOK = False
+			
 		else:
 			shared.PAUSE_HOOK = True
 	
 		if shared.USERID != -1 and shared.IS_COMMUNICATION_MANAGER_STARTED: #started.
 			if not shared.PAUSE_HOOK:
 				pass_to_manager(StartIDAEvent())
-			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID}))
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID,"need-to-pull": shared.MASTER_PAUSE_HOOK}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_USER, json.dumps({"username":shared.USERNAME, "id": shared.USERID, "token": shared.USER_TOKEN}))
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_BASE_URL, json.dumps({"url": shared.BASE_URL}))
 			
