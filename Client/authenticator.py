@@ -49,6 +49,9 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 		selector.Execute()
 		if shared.IS_COMMUNICATION_MANAGER_STARTED:
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID, "need-to-pull": shared.MASTER_PAUSE_HOOK}))
+			if shared.MASTER_PAUSE_HOOK:
+				idaapi.register_action(action_manual_pull)
+				idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/Pull from server", "idahub:manual_pull",idaapi.SETMENU_APP)			
 		return ida_idp.IDP_Hooks.ev_newfile(self, fname)
 
 	def ev_oldfile(self, fname):
@@ -58,6 +61,9 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 		selector.Execute()
 		if shared.IS_COMMUNICATION_MANAGER_STARTED:
 			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID, "need-to-pull": shared.MASTER_PAUSE_HOOK}))
+			if shared.MASTER_PAUSE_HOOK:
+				idaapi.register_action(action_manual_pull)
+				idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/Pull from server", "idahub:manual_pull",idaapi.SETMENU_APP)			
 		return ida_idp.IDP_Hooks.ev_oldfile(self, fname)
 
 
