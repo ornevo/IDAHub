@@ -7,7 +7,11 @@ import { Helmet } from 'react-helmet';
 const Page = (props) => (
     <Container className="Page-container">
         {/* Browser tab title */}
-        <Helmet><title>{ props.title || "IDAHub" }</title></Helmet>
+        <Helmet>
+		<title>
+			{ props.stringTitle || props.title || "IDAHub" }
+		</title>
+	</Helmet>
 
         {/* Page title */}
         <div className="Page-sub-container Page-header-container">
@@ -26,6 +30,7 @@ const Page = (props) => (
 
 Page.propTypes = {
     title: PropTypes.any.isRequired,
+    stringTitle: PropTypes.string,
     children: PropTypes.element.isRequired
 }
 
