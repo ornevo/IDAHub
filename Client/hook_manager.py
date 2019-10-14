@@ -95,7 +95,7 @@ class LiveHook(ida_idp.IDB_Hooks):
 	def changing_cmt(self, ea, repeatable_cmt, newcmt):
 		if not shared.PAUSE_HOOK:
 			log("New comment: {0} {1}".format(hex(ea), newcmt))
-			pass_to_manager(ChangeCommentEvent(ea, newcmt, "repetable" if repeatable_cmt else "regular"))
+			pass_to_manager(ChangeCommentEvent(ea, newcmt, "repetable" if repeatable_cmt else "regular", 0))
 		return ida_idp.IDB_Hooks.changing_cmt(self,ea,repeatable_cmt, newcmt)
 
 	def func_added(self,pfn):
@@ -187,7 +187,7 @@ class LiveHook(ida_idp.IDB_Hooks):
 			if kind == 1:
 				log("Change range comment {0} {1} {2} {3}".format(kind, a.start_ea, cmt, repeatable))
 				function_address = a.start_ea
-				pass_to_manager(ChangeCommentEvent(function_address, cmt, "function"))
+				pass_to_manager(ChangeCommentEvent(function_address, cmt, "function", 0))
 		return ida_idp.IDB_Hooks.changing_range_cmt(self, kind, a, cmt, repeatable)	
 
 	def enum_created(self, id):

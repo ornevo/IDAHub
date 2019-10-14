@@ -98,7 +98,7 @@ def get_last_update_time_from_config():
 		return data[PROJECT_ID]["last-update"]
 	else:
 		update_the_config_file(0)
-		return get_data_from_config_file()
+		return get_last_update_time_from_config()
 
 def update_the_config_file(current_time):
 	data = {}
