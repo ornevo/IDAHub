@@ -156,11 +156,18 @@ class user_manager():
 
 	def change_ea_of_user(self, user, ea):
 		if not shared.MASTER_PAUSE_HOOK:
+			added = False
 			for user_dict in self._users:
 				if  user == shared.USERNAME:
 					continue
 				if user_dict["user"] == user:
 					user_dict["ea"] = ea
+					added = True
+
+			# need to add logged user
+			if not added:
+				self.add_logged_user(user)
+				self.change_ea_of_user(user, ea)
 			shared.PAINTER.refresh()
 
 	def remove_logged_user(self, user):
@@ -169,14 +176,15 @@ class user_manager():
 			if user == shared.USERNAME:
 				return 0
 			tmp_arr = []
-			user_color = ""
+			user_color = None
 			for user_dict in self._users:
 				if user != user_dict["user"]:
 					tmp_arr.append({"user": user_dict["user"], "logged": user_dict["logged"], "ea": user_dict["ea"], "color": user_dict["color"]})
 				else:
 					user_color = user_dict["color"]
-			self._used_colors = list(set(self._used_colors) - set(user_color))
-			self._users = tmp_arr
+			if user_color:
+				self._used_colors = list(set(self._used_colors) - set(user_color))
+				self._users = tmp_arr
 
 	def get_users(self):
 		return self._users
