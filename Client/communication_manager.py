@@ -68,7 +68,7 @@ def message_handler(window_handler, msg, wParam, lParam):
 		data = json.loads(decode_data(lParam))
 		BASE_URL = data["url"]
 	elif wParam == MANUAL_PULL_ID:
-		pull_from_server(INTEGRATOR_WINDOW_KEY)
+		pull_from_server(INTEGRATOR_WINDOW_KEY, True)
 
 def send_data_to_server(data):
 	if PROJECT_ID == -1 or SECRECT_KEY == "":
@@ -113,8 +113,8 @@ def update_the_config_file(current_time):
 		data[PROJECT_ID]["last-update"] = current_time
 		f.write(json.dumps(data))
 	
-def pull_from_server(integrator_window_key):
-	if NEED_TO_PULL:
+def pull_from_server(integrator_window_key, forced_pull = False):
+	if NEED_TO_PULL and not forced_pull:
 		return -1
 	if PROJECT_ID == -1 or SECRECT_KEY == "":
 		return -1

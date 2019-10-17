@@ -71,7 +71,7 @@ class PullHandler(idaapi.action_handler_t):
 	def __init__(self):
 		return idaapi.action_handler_t.__init__(self)
 
-	def active(self,ctx):
+	def activate(self,ctx):
 		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.MANUAL_PULL_ID, json.dumps({}))
 
 	def update(self,ctx):
@@ -94,6 +94,7 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 	def ready_to_run(self):
 		if shared.MASTER_PAUSE_HOOK:
 			idaapi.register_action(action_manual_pull)
+			constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID, "need-to-pull": shared.MASTER_PAUSE_HOOK}))
 			idaapi.attach_action_to_menu("Edit/Plugins/IDAHub/Pull from server", "idahub:manual_pull",idaapi.SETMENU_APP)			
 
 	def run(self):

@@ -159,6 +159,7 @@ class user_manager():
 			added = False
 			for user_dict in self._users:
 				if  user == shared.USERNAME:
+					added = True
 					continue
 				if user_dict["user"] == user:
 					user_dict["ea"] = ea
@@ -183,7 +184,7 @@ class user_manager():
 				else:
 					user_color = user_dict["color"]
 			if user_color:
-				self._used_colors = list(set(self._used_colors) - set(user_color))
+				self._used_colors = list(set(self._used_colors) - set([user_color]))
 				self._users = tmp_arr
 
 	def get_users(self):
