@@ -1,9 +1,12 @@
 from idaapi import Form, warning
 import idc
+import ida_nalt
+import ida_pro
 import requests
 import json
 import jwt
 import shared
+import constants
 class ProjectSelector(Form):
 	def __init__(self, project_list):
 		self.invert = False
@@ -25,19 +28,34 @@ Project selector form
 				project_id = idc.AskStr("", "Project id:")
 				try:
 					headers = {"Authorization" : "Bearer {0}".format(shared.USER_TOKEN)}
-					data = json.loads(requests.get("{0}/{1}".format(shared.BASE_URL, shared.GET_PROJECT_HEADER), headers = headers).content)
-					contributors = data["contributors"]
+					data = json.loads(requests.get("{0}/{1}".format(shared.BASE_URL, constants.GET_PROJECT_HEADER.format(project_id)), headers = headers).content)
+					hash_of_program = data["body"]["hash"]
+					warning("{0} {1}".format(ida_nalt.retrieve_input_file_sha256().lower(), hash_of_program))
+					if ida_nalt.retrieve_input_file_sha256().lower() != hash_of_program:
+						pass
+						#warning("Wrong hash of program, exiting now")
+						#ida_pro.qexit(1)
+					contributors = data["body"]["contributors"]
 					shared.MASTER_PAUSE_HOOK = True
 					for cont in contributors:
 						if cont["id"] == shared.USERID:
 							shared.MASTER_PAUSE_HOOK = False
 							shared.PAUSE_HOOK = True
 							break
-					shared.PROJECT_ID = data["id"]
-				except Exception:
-					warning("Cant get project information")
+					shared.PROJECT_ID = data["body"]["id"]
+				except Exception as e:
+					warning("Cant get project information: " + str(e))
 					return 0
 			else:
+				headers = {"Authorization" : "Bearer {0}".format(shared.USER_TOKEN)}
+				data = json.loads(requests.get("{0}/{1}".format(shared.BASE_URL, constants.GET_PROJECT_HEADER.format(self._project_list[self.GetControlValue(self.iProject)].split(" ")[0])), headers = headers).content)
+				warning(str(data))
+				hash_of_program = data["body"]["hash"]
+				warning("{0}----{1}".format(ida_nalt.retrieve_input_file_sha256().lower(), hash_of_program))
+				if ida_nalt.retrieve_input_file_sha256().lower() != hash_of_program:
+					pass
+					#warning("Wrong hash of program, exiting now")
+					#ida_pro.qexit(1)
 				shared.PROJECT_ID = self._project_list[self.GetControlValue(self.iProject)].split(" ")[0]
 			return 1
 		else:
