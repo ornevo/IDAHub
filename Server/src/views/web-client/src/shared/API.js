@@ -4,7 +4,7 @@ import { safeget } from "./Utils";
 import * as HttpStatus from 'http-status-codes'
 
 
-const URL = "https://idahub.live";
+const URL = "http://localhost";
 
 
 // This wraps the promise so that from success response it extracts the body,
