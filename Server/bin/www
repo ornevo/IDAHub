@@ -9,19 +9,33 @@ var debug = require('debug')('idahub:server');
 var http = require('http');
 var mongoose = require('mongoose');
 var process = require('process');
+var fs = require('fs');
+var https = require('https');
+
+var privateKey  = fs.readFileSync('/etc/letsencrypt/live/idahub.live/privkey.pem', 'utf8')
+var certificate = fs.readFileSync('/etc/letsencrypt/live/idahub.live/fullchain.pem', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
 
 /**
  * Get port from environment and store in Express.
  */
 
 var port = normalizePort(process.env.PORT || '80');
-app.set('port', port);
+var portHTTPS = normalizePort(process.env.HTTPS_PORT || '443');
+app.set('port', portHTTPS);
 
 /**
- * Create HTTP server.
+ * Create HTTP server to forward to https
  */
+var server = http.createServer(function (req, res) {
+    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+    res.end();
+}).listen(80);
 
-var server = http.createServer(app);
+/**
+ * Create https server
+ */
+var httpsServer = https.createServer(credentials, app);
 
 /**
  * Connect to the mongo server
@@ -32,16 +46,14 @@ mongoose.connect("mongodb://localhost/idahub").catch(r => {
   process.exit(1);
 });
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+/* The actual https server, listen */
+httpsServer.listen(portHTTPS);
+httpsServer.on('error', onError);
+httpsServer.on('listening', onListening);
 
-server.on('exit', () => server.close());
-server.on('uncaughtException', () => server.close());
-server.on('SIGTERM', () => server.close());
+httpsServer.on('exit', () => httpsServer.close());
+httpsServer.on('uncaughtException', () => httpsServer.close());
+httpsServer.on('SIGTERM', () => httpsServer.close());
 
 /**
  * Normalize a port into a number, string, or false.
@@ -96,7 +108,7 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
+  var addr = httpsServer.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;

@@ -52,6 +52,19 @@
     font-size: 1rem;
 }
 
+.ProjectContainer-id {
+    font-size: 16px;
+    line-height: 20px;
+    display: inline-block;
+    padding: 5px 10px;
+}
+
+.ProjectContainer-name {
+    line-height: 0;
+    margin-top: 35px;
+    margin-bottom: 5px;
+}
+
 @media (max-width: 800px) {
     .ProjectContainer-small-statistics {
         grid-template-columns: 1fr 1fr;

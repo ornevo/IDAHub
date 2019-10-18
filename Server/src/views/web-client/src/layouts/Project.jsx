@@ -146,8 +146,15 @@ class Project extends React.Component {
             )
         }
 
+	const pageTitle = (
+		<span>
+			<div className="ProjectContainer-name">{softenedProject.name}</div>
+			<div className="ProjectContainer-id snippet">Project id: {softenedProject.id}</div>
+		</span>
+	);
+
         return (
-            <Page title={softenedProject.name || "Loading..."}>
+            <Page title={pageTitle || "Loading..."} stringTitle={softenedProject.name || "Loading..."}>
                 { pageContent }
             </Page>
         )

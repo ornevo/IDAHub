@@ -36,10 +36,11 @@ const handler = (req, res) => {
     newModification.userId = a.id;
     newModification.timestamp = (Math.floor(new Date().getTime()/1000.0)).toString();
     newModification.eventId = req.body["event-id"];
-    req.body = JSON.stringify(req.body)
+
+    req.body = JSON.parse(JSON.stringify(req.body));
 
     //check the rest input
-    if(!((req.body.hasOwnProperty('linear-address') && typeof req.body["linear-address"]=="number") || req.body.hasOwnProperty('linear-address')==false)){
+    if(!((req.body.hasOwnProperty('linear-address') && typeof req.body["linear-address"] == "string" || req.body.hasOwnProperty('linear-address')==false))){
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -49,8 +50,6 @@ const handler = (req, res) => {
         else
             newModification.linearAddress = null;
     }
-
-
     if(!((req.body.hasOwnProperty('value') && typeof req.body.value=="string") || req.body.hasOwnProperty('value')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
@@ -62,7 +61,6 @@ const handler = (req, res) => {
             newModification.value = null;
     }
     
-
     if(!(   (req.body.hasOwnProperty('label-type') && typeof req.body["label-type"] =="string") || req.body.hasOwnProperty('label-type')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
@@ -87,7 +85,7 @@ const handler = (req, res) => {
     }
     
 
-    if(!(   (req.body.hasOwnProperty('offset') && typeof req.body.offset=="number") || req.body.hasOwnProperty('offset')==false   )   ){
+    if(!(   (req.body.hasOwnProperty('offset') && typeof req.body.offset=="string") || req.body.hasOwnProperty('offset')==false   )   ){
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -97,7 +95,6 @@ const handler = (req, res) => {
         else
             newModification.offset = null;
     }
-
 
     if(!(   (req.body.hasOwnProperty('variable-type') && typeof req.body["variable-type"]=="string") || req.body.hasOwnProperty('variable-type')==false   )   ){
         sendJSONResponse(res, "inputError", false);
@@ -110,8 +107,7 @@ const handler = (req, res) => {
             newModification.variableType = null;
     }
 
-
-    if(!((req.body.hasOwnProperty('name') && typeof req.body.name=="string") || req.body.hasOwnProperty('name')==false   )   ){
+    if(!((req.body.hasOwnProperty('name') && typeof req.body.name=="string") || req.body.hasOwnProperty('name') == false)) {
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -122,8 +118,7 @@ const handler = (req, res) => {
             newModification.name = null;
     }
 
-
-    if(!((req.body.hasOwnProperty('id') && typeof req.body.id=="string") || req.body.hasOwnProperty('id')==false   )   ){
+    if(!((req.body.hasOwnProperty('id') && typeof req.body.id=="string") || req.body.hasOwnProperty('id') == false)) {
         sendJSONResponse(res, "inputError", false);
         return;
     }
@@ -134,9 +129,6 @@ const handler = (req, res) => {
             newModification.id = null;
     }
 
-    
-
-
     // check if the user belongs to the project.
     UserInProject.find({ userId: newModification.userId }, (err, foundDocs) => {
         if(err) {
@@ -145,6 +137,7 @@ const handler = (req, res) => {
         }
         var flag = false;
         const searchedProjectIds = foundDocs.map(d => d.projectId);
+	var flag = false;
         for(var v=0;v<searchedProjectIds.length;v++){
             var vv=searchedProjectIds[v].toString();
             var p=newModification.projectId.toString();
