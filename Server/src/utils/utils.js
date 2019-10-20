@@ -10,7 +10,7 @@ const createProjectHeader = (projectObject, contributorsArray) => (
     {
         name: projectObject.name,
         description: projectObject.description,
-        hash: projectObject.description,
+        hash: projectObject.hash,
         owner: projectObject.owner,
         id: projectObject._id,
         public: projectObject.public,
