@@ -11,7 +11,7 @@ import { query } from 'express-validator/check';
 // Some input controll validators
 const validators = [
     defaultParamToMiddleware('page', 'query', 1),
-    query("name").isAlphanumeric().isLength({ max: 50 }),
+    query("name").isAlphanumeric().isLength({ max: 100 }),
     query("page").isNumeric()
 ]
 

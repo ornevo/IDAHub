@@ -79,7 +79,7 @@ export default class NewProjectLayout extends React.Component {
 
         return (
             <Page title="New Project">
-                <NewProjectForm onSubmit={this.onSubmit.bind(this)} />
+                <NewProjectForm jwtToken={this.context} onSubmit={this.onSubmit.bind(this)} />
             </Page>
         )
     }

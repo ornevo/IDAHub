@@ -4,7 +4,10 @@ import {
     Container, Button, Switch, FormHelperText,
     Typography, FormLabel, TextField
 } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
+
+import { projectsSearch } from "../shared/API";
 
 import Loader from "../components/Loader";
 import UserSelector from "../components/UserSelector";
@@ -31,7 +34,8 @@ class NewProjectForm extends React.Component {
             isPrivate: false,
             fileHash: "",
             contributers: [],
-            isCalculatingHash: false
+            isCalculatingHash: false,
+            isDuplicate: false // Is there already a public project of this reversed file
         }
     }
 
@@ -42,6 +46,9 @@ class NewProjectForm extends React.Component {
 
     onHashCalculationFinished(e) {
         const calculatedHash = e.data;        
+
+        this.lookForExistingProjects(calculatedHash);
+        
         // When done, update result and remove loading animation
         this.setState({ fileHash: calculatedHash, isCalculatingHash: false });
     }
@@ -56,9 +63,33 @@ class NewProjectForm extends React.Component {
         this.hashCalculationWorker.postMessage(asUintArr);
     }
 
-    onHashChange(e) {
+    onHashChange(e) {        
         const newHash = e.target.value.substring(0, 64);
+
+        this.lookForExistingProjects(newHash);
+        
         this.setState({ fileHash: newHash });
+    }
+
+    lookForExistingProjects(newHash) {
+        // If finished typing the hash
+        if(newHash.length !== 64)
+            return;
+
+        projectsSearch(newHash, this.props.jwtToken).then((resp, err) => {
+            console.log("HERE", err, resp, err || !resp || resp.data.length === 0);
+            
+            const foundProjects = resp ? resp.data : [];
+
+            // The last contidion makes sure hash not found in description or something
+            if(err || !resp || !foundProjects || foundProjects.length === 0 ||
+                    !foundProjects.find(p => p.hash === newHash)) {
+                this.setState({isDuplicate: false});
+                return;
+            }
+
+            this.setState({isDuplicate: true});
+        }).catch(null)
     }
 
     onReversedFileChange(e) {
@@ -184,6 +215,30 @@ class NewProjectForm extends React.Component {
                         </div>
                     </div>
 
+                    {/* Duplicate alert */}
+                    {
+                        this.state.isDuplicate && (
+                            <div className="NewProject-hash-duplicate-alert">
+                                <Typography variant="h6">This file already got reversed</Typography>
+                                <Typography variant="subtitle1">
+                                    There is already a project reversing a file with the same hash as your file, and its available publicly.
+                                    <br />
+                                    You could join the already existing project, and save yourself some time and effort!
+                                    <br />
+                                    <Link className="NewProject-duplicate-discover-button" to={"/search/" + this.state.fileHash}>
+                                        <Button
+                                            variant="outlined"
+                                            color="primary"
+                                            className={this.classes.submit}
+                                        >
+                                            Discover existing projects
+                                        </Button>
+                                    </Link>
+                                </Typography>
+                            </div>
+                        )
+                    }
+
                     {/* Contributers */}
                     <Typography variant="h4">Contributers</Typography>
                     <Typography variant="subtitle1">Users allowed to make changes to the project.</Typography>
@@ -207,6 +262,7 @@ class NewProjectForm extends React.Component {
 
 NewProjectForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
+    jwtToken: PropTypes.string,
     isLoading: PropTypes.bool
 };
 

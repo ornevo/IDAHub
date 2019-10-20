@@ -13,7 +13,7 @@ export const getProjectHeaders = (projectIds, callback) => {
         }
 
         // The project header contains each project's contributors,
-        //  so we need to gather all contributors in the  projects we return
+        //  so we need to gather all contributors in the projects we return
         const returnedProjectIds = projects.map(p => p._id);
 
         UserInProject.find({ projectId: { $in: returnedProjectIds } }, (err, uInP) => {

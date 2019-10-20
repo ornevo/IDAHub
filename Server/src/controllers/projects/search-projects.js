@@ -13,7 +13,7 @@ import { query } from 'express-validator/check';
 const validators = [
     validateAuthToken(false),
     defaultParamToMiddleware('page', 'query', 1),
-    query("query").isAscii().isLength({ max: 50 }),
+    query("query").isAscii().isLength({ max: 100 }),
     query("page").isNumeric()
 ]
 
@@ -26,7 +26,8 @@ const handler = (req, res) => {
     Project.paginate(
         { $or: [ // query
             { name: { $regex: searchedQuery, $options: "i" } }, 
-            { description: { $regex: searchedQuery, $options: "i" } }
+            { description: { $regex: searchedQuery, $options: "i" } },
+            { hash: searchedQuery }
         ]},
         { page: pagenum, limit: ResultsPageSize }, // options
         (err, paginationResult) => {
