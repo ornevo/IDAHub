@@ -45,7 +45,7 @@ const validators = [
 const handler = (req, res) => {
     var mongoose = require('mongoose');
     var projId = mongoose.Types.ObjectId(req.params['projectId']);
-    var curtimestamp = (Math.floor(new Date().getTime() / 1000.0)).toString();
+    var curtimestamp = (Math.floor(new Date().getTime() / 100.0)).toString();
     var lastupdate = req.body.lastUpdate;
     var loggedOn;
     var loggedOff;

@@ -34,7 +34,7 @@ const handler = (req, res) => {
     newModification.projectId = mongoose.Types.ObjectId(req.params['projectId']);
     const a=req.jwt;
     newModification.userId = a.id;
-    newModification.timestamp = (Math.floor(new Date().getTime()/1000.0)).toString();
+    newModification.timestamp = (Math.floor(new Date().getTime()/100.0)).toString();
     newModification.eventId = req.body["event-id"];
 
     req.body = JSON.parse(JSON.stringify(req.body));
