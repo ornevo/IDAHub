@@ -121,7 +121,7 @@ def pull_from_server(integrator_window_key, forced_pull = False):
 	params = {"projectId": PROJECT_ID, "lastUpdate": get_last_update_time_from_config()}
 	headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
 	try:
-			req = requests.get("{0}/{1}".format(BASE_URL, GET_PROJECT_CHANGES_PATH.format(PROJECT_ID)), data=params, headers = headers, timeout=2)
+			req = requests.get("{0}/{1}".format(BASE_URL, GET_PROJECT_CHANGES_PATH.format(PROJECT_ID)), data=params, headers = headers, timeout=6)
 	except Exception as e:
 		print e
 		return -1	
@@ -134,6 +134,8 @@ def pull_from_server(integrator_window_key, forced_pull = False):
 	data_parsed = data_parsed["body"]
 	update_the_config_file(data_parsed["curtimestamp"])
 	new_symbols = data_parsed["symbols"]
+
+	new_symbols = sorted(new_symbols, key=lambda  k: k["timestamp"])
 	for symbol in new_symbols:
 		send_data_to_window(integrator_window_key, SEND_DATA_TO_IDA, json.dumps(symbol))
 	logged_users = data_parsed["loggedOn"]

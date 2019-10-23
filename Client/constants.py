@@ -149,7 +149,7 @@ DELETE_ENUM_MEMBER_ID = 26
 
 
 ## Settings
-PULLING_TIME = 0.2
+PULLING_TIME = 0.7
 KEEP_ALIVE_TIME = 0.01
 
 ## User colors
