@@ -1,7 +1,6 @@
 /* Don't ask me whats going on in here. I assume no one will ever read or maintain this code. I deeply apologize if this is not the case. */
 import React from 'react';
 import PropTypes from 'prop-types';
-import * as HttpStatus from 'http-status-codes'
 import { NotificationManager } from "react-notifications";
 
 import 'react-notifications/lib/notifications.css';
