@@ -42,6 +42,5 @@ cd ~/IDAHub/Server
 git pull
 sudo npm run stop
 sudo npm run build-client
-sudo npm run build
 sudo npm run start
 ```
