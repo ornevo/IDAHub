@@ -32,9 +32,8 @@ Project selector form
 					hash_of_program = data["body"]["hash"]
 					warning("{0} {1}".format(ida_nalt.retrieve_input_file_sha256().lower(), hash_of_program))
 					if ida_nalt.retrieve_input_file_sha256().lower() != hash_of_program:
-						pass
-						#warning("Wrong hash of program, exiting now")
-						#ida_pro.qexit(1)
+						warning("Wrong hash of program, exiting now")
+						ida_pro.qexit(1)
 					contributors = data["body"]["contributors"]
 					shared.MASTER_PAUSE_HOOK = True
 					for cont in contributors:
@@ -49,13 +48,10 @@ Project selector form
 			else:
 				headers = {"Authorization" : "Bearer {0}".format(shared.USER_TOKEN)}
 				data = json.loads(requests.get("{0}/{1}".format(shared.BASE_URL, constants.GET_PROJECT_HEADER.format(self._project_list[self.GetControlValue(self.iProject)].split(" ")[0])), headers = headers).content)
-				warning(str(data))
 				hash_of_program = data["body"]["hash"]
-				warning("{0}----{1}".format(ida_nalt.retrieve_input_file_sha256().lower(), hash_of_program))
 				if ida_nalt.retrieve_input_file_sha256().lower() != hash_of_program:
-					pass
-					#warning("Wrong hash of program, exiting now")
-					#ida_pro.qexit(1)
+					warning("Wrong hash of program, exiting now")
+					ida_pro.qexit(1)
 				shared.PROJECT_ID = self._project_list[self.GetControlValue(self.iProject)].split(" ")[0]
 			return 1
 		else:
