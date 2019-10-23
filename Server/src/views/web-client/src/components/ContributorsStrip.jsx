@@ -4,11 +4,13 @@ import Chip from '@material-ui/core/Chip';
 import { Typography } from '@material-ui/core';
 import { FaPlus, FaRegClock } from "react-icons/fa";
 import JWT from "jsonwebtoken";
+import { NotificationManager } from 'react-notifications';
 
 import UserChip from '../components/UserChip';
+import AddContributorsModalContent from '../modals-contents/AddContributorsModalContent';
 import { SentRequestsContext } from "../shared/Contexts";
 import { sendJoinRequest } from "../shared/API";
-import { NotificationManager } from 'react-notifications';
+import Modal from "../components/Modal";
 
 
 class ContributorStrip extends React.Component {
@@ -22,7 +24,8 @@ class ContributorStrip extends React.Component {
             // Since once sending request the sentRequests context will get updated, this component will get remounted quite quickly.
             //  hence we only need to know whether it generally already sent, because of it's short life afterwards.
             // We need this to prevent some prblems, just don't mess with it
-            hasSentSentRequest: false
+            hasSentSentRequest: false,
+            isAddingContributorsModalOpen: false
         }
     }
 
@@ -65,10 +68,11 @@ class ContributorStrip extends React.Component {
     }
 
     render() {
-        // Decide how to display the "join" button
+        // Decide how to display the "join" button and whether to show adding users option
         let joinButton = "";
+        let addButton = "";
+
         if(this.props.authToken) {
-            
             const decodedToken = JWT.decode(this.props.authToken);
             
             if(decodedToken && !this.props.contributors.find(cont => cont.id === decodedToken.id)) {
@@ -83,6 +87,19 @@ class ContributorStrip extends React.Component {
                     />
                 );
             }
+
+            if(decodedToken && decodedToken.id === this.props.projectOwner)
+                addButton = (
+                    <div className="ProjectContainer-chips-container">
+                        <Chip
+                            className="UserChip UserChip-join"
+                            icon={<FaPlus />}
+                            label="Add contributor"
+                            color="secondary"
+                            onClick={() => this.setState({ isAddingContributorsModalOpen: true }) }
+                        />
+                    </div>
+                );
         }
 
         // Make sure the owner is rendered first in the list
@@ -93,6 +110,17 @@ class ContributorStrip extends React.Component {
 
         return (
             <div className="ProjectContainer-contributors-container">
+                {/* The add contributors dialog, if open */}
+                <Modal  isOpen={this.state.isAddingContributorsModalOpen}
+                        isOnHomepage={false}
+                        onClose={() => this.setState({ isAddingContributorsModalOpen: false })}>
+                    <AddContributorsModalContent
+                        onAdded={this.props.reloadProject}
+                        jwtToken={this.props.authToken}
+                        projectId={this.props.projectId}
+                    />
+                </Modal>
+
                 <Typography variant="h4">Contributors</Typography>
                 <Typography variant="h6">Online: {this.props.onlineCount}</Typography>
                 <div className="ProjectContainer-chips-container">
@@ -109,6 +137,7 @@ class ContributorStrip extends React.Component {
                         </span>
                     ))
                 }
+                { addButton }
             </div>
         )
     }

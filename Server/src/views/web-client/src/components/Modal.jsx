@@ -50,7 +50,7 @@ class Modal extends React.Component {
         // We want to build it depending on screen width, so it needs to be calculated dynamically
         const modalStyle = {
             bottom: "0px",
-            top: "40px",
+            top: this.props.isOnHomepage ? "40px" : "80px",
             left: ((this.state.screenWidth - this.state.modalWidth) / 2) + "px",
             width: this.state.modalWidth,
             padding: 0,
@@ -58,7 +58,7 @@ class Modal extends React.Component {
             insert: "50% 0 0 0"
         };
         return (
-            <ReactModal 
+            <ReactModal
                 style={{overlay: { zIndex: -100 }, content: modalStyle}}
                 isOpen={this.props.isOpen} onRequestClose={this.props.onClose} closeTimeoutMS={250}>
 
@@ -79,12 +79,14 @@ class Modal extends React.Component {
 Modal.propTypes = {
     isOpen: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
-    children: PropTypes.element.isRequired
+    children: PropTypes.element.isRequired,
+    isOnHomepage: PropTypes.bool,
 };
 
 Modal.defaultProps = {
     isOpen: false,
-    children: ''
+    children: '',
+    isOnHomepage: true
 }
 
 

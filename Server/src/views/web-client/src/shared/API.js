@@ -103,6 +103,14 @@ export const projectsSearch = (query, authApiKey=null) => {
     );
 }
 
+export const addContributor = (projectId, userId, authApiKey) => {
+    const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
+
+    return _wrap_api_promise(
+        axios.post(URL + "/api/projects/" + projectId + "/users/" + userId, {}, { headers })
+    );
+}
+
 export const sendJoinRequest = (projectId, authApiKey) => {
     const headers = authApiKey ? __auth_key_to_headers(authApiKey) : null;
 
