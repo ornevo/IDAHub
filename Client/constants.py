@@ -82,17 +82,21 @@ def create_general_config_file():
 
 
 def get_data_from_config_file(config_key):
-	with open(GENERAL_CONFIG_FILE, 'r') as f:
-		try:
-			data = json.loads(f.read())
-		except TypeError as err: # need to create config file again.
-			create_config_file()
-			return ""
-		if config_key in data:
-			return data[config_key]
-		else:
-			return ""
-
+	try:
+		with open(GENERAL_CONFIG_FILE, 'r') as f:
+			try:
+				data = json.loads(f.read())
+			except TypeError as err: # need to create config file again.
+				create_general_config_file()
+				get_data_from_config_file(config_key)
+				return ""
+			if config_key in data:
+				return data[config_key]
+			else:
+				return ""
+	except IOError:
+		create_general_config_file()
+		get_data_from_config_file(config_key)
 def set_data_to_config_file(config_key, value):
 	with open(GENERAL_CONFIG_FILE, 'r') as f:
 		try:

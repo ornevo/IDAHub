@@ -66,6 +66,8 @@ class Painter(QObject):
                 func_ea = int(index.sibling(index.row(), 2).data(), 16)
                 func = ida_funcs.get_func(func_ea)
                 for user in self._user_manager.get_users():
+                    if not user["logged"]:
+                        continue
                     if ida_funcs.func_contains(func, user["ea"]):
                         r, g, b = ida_to_python(user["color"])
                         return QColor(python_to_qt(r, g, b))
@@ -88,6 +90,8 @@ class Painter(QObject):
         users = self._user_manager.get_users()
         if users:
             for user in users:
+                if not user["logged"]:
+                    continue
                 # Cursor color
                 if ea - nbytes * 2 <= user["ea"] <= ea + nbytes * 2:
                     return long(user["color"])
@@ -112,6 +116,8 @@ class Painter(QObject):
             return None
 
         for user in users:
+            if not user["logged"]:
+                continue
             start_ea = user["ea"] - self._nbytes * 4
             end_ea = user["ea"] + self._nbytes * 4
             # Check if the navbar range contains the user's address
@@ -125,6 +131,8 @@ class Painter(QObject):
             return None
 
         for user in users:
+            if not user["logged"]:
+                continue
             if ea == user["ea"]:
                 return user["color"]
         return None
