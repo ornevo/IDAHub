@@ -101,6 +101,7 @@ class authenticator(idaapi.UI_Hooks, idaapi.plugin_t):
 		pass
 
 	def init(self):
+		constants.create_general_config_file()
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 		
