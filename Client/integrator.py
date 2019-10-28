@@ -149,6 +149,7 @@ class user_manager():
 		if not shared.MASTER_PAUSE_HOOK:
 			for user_dict in self._users:
 				if user == user_dict["user"]:
+					user_dict["logged"] = True
 					return 0
 			color = random.choice(list(set(constants.COLOR_ARRAY) - set(self._used_colors)))
 			self._used_colors.append(color)
@@ -156,37 +157,26 @@ class user_manager():
 
 	def change_ea_of_user(self, user, ea):
 		if not shared.MASTER_PAUSE_HOOK:
-			added = False
 			for user_dict in self._users:
 				if  user == shared.USERNAME:
-					added = True
 					continue
 				if user_dict["user"] == user:
 					user_dict["ea"] = ea
-					added = True
-
-			# need to add logged user
-			if not added:
-				self.add_logged_user(user)
-				self.change_ea_of_user(user, ea)
 			shared.PAINTER.refresh()
 
 	def remove_logged_user(self, user):
 		if not shared.MASTER_PAUSE_HOOK:
 			#In the case we get logged of user, that is our's from the last session.
+			
 			if user == shared.USERNAME:
 				return 0
-			tmp_arr = []
-			user_color = None
+			# we need to assign color to the user so we add it first.
+			self.add_logged_user(user)
+			# Than we can set the logged to false.
 			for user_dict in self._users:
-				if user != user_dict["user"]:
-					tmp_arr.append({"user": user_dict["user"], "logged": user_dict["logged"], "ea": user_dict["ea"], "color": user_dict["color"]})
-				else:
-					user_color = user_dict["color"]
-			if user_color:
-				self._used_colors = list(set(self._used_colors) - set([user_color]))
-				self._users = tmp_arr
-
+				if user == user_dict["user"]:
+					user_dict["logged"] = False
+	
 	def get_users(self):
 		return self._users
 
@@ -208,6 +198,7 @@ class integrator(idaapi.UI_Hooks, idaapi.plugin_t):
 		self._widget.install(self._window)
 
 	def init(self):	
+		constants.create_general_config_file()
 		shared.BASE_URL = constants.get_data_from_config_file("server")
 		shared.LOG = constants.get_data_from_config_file("log")
 
