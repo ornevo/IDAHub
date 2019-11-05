@@ -7,11 +7,6 @@ import requests
 import json
 
 
-def create_new_user(username, password):
-    email = "test_{0}@gm.com".format(username)
-    return requests.post("https://idahub.live/api/users", data={"username": str(username), "password": str(password), "email": email}   )
-
-
 URL = "http://localhost"
 LOGIN_URI = "/api/users/token"
 SIGNUP_URI = "/api/users"
@@ -39,6 +34,10 @@ TEST_PUBLIC_PROJECT = {
 
 
 # Helpers
+def create_new_user(username, password):
+    email = "test_{0}@gm.com".format(username)
+    return requests.post("https://idahub.live/api/users", data={"username": str(username), "password": str(password), "email": email}   )
+
 def get_test_loggedin_session(credentials):
     '''
     returns a requests session already authenticated as test user
@@ -112,8 +111,6 @@ class TestWebAPI(unittest.TestCase):
 
         headers = {"Authorization": "Bearer " + token_value_public}
         self.assertEqual(len(json.loads(requests.get("https://idahub.live/api/projects", headers = headers, params="query="+ project_name).content)["body"]["data"]), 0)
-
-
 
     def test_admin_approval_privilage(self):
         '''
