@@ -81,8 +81,25 @@ class TestWebAPI(unittest.TestCase):
         requests.post("https://idahub.live/api/projects/" + id_of_project + "/session/stop",headers = headers_user_1)
         self.assertEqual(json.loads(requests.get("https://idahub.live/api/projects/" + id_of_project + "/statistics",headers = headers_user_1).content)["body"]["onlineCount"], 0)
         
-        
-
+		
+    def test_modification(self):
+        #Create new user and new project for the test.
+        user_name_1 = "1Mod" + ''.join(random.choice(string.letters) for i in range(4))
+        create_new_user(user_name_1, "1234")
+        token = json.loads(requests.get("https://idahub.live/api/users/token", params={"username": user_name_1, "password": "1234"}).content)
+        token_value_user_1 = token["body"]["token"]
+        headers_user_1 = {"Authorization": "Bearer " + token_value_user_1}
+        project_name = "SomeProjectForModification" + ''.join(random.choice(string.letters) for i in range(4))
+        project_header = {"name": project_name, "description": "desc", "contributors": [], "public": True, "hash": hashlib.sha256(project_name).hexdigest()}
+        create_project_request = requests.post("https://idahub.live/api/projects", json={"project-header": project_header}, headers=headers_user_1)
+        self.assertEqual(create_project_request.status_code, 200)
+        id_of_project = json.loads(create_project_request.content)["body"]["project-header"]["id"]
+        # Test 1 modification, the change comment.
+        event_dict = {"event-id": 4, "linear-address": "10000", "value":"Hello", "projectId": id_of_project}
+        self.assertEqual(json.loads(requests.get("https://idahub.live/api/projects/" + id_of_project + "/statistics",headers = headers_user_1).content)["body"]["modifications"], 0)
+        self.assertEqual(requests.post("https://idahub.live/api/projects/" + id_of_project + "/push",params={"projectId": id_of_project}, json = event_dict, headers = headers_user_1).status_code, 200)
+        self.assertEqual(json.loads(requests.get("https://idahub.live/api/projects/" + id_of_project + "/statistics",headers = headers_user_1).content)["body"]["modifications"], 1)
+		
 
 if __name__ == "__main__":
     unittest.main()    
