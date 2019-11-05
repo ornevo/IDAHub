@@ -1,8 +1,15 @@
 import unittest
 import random
+import hashlib
 import string
 import json
 import requests
+import json
+
+
+def create_new_user(username, password):
+    email = "test_{0}@gm.com".format(username)
+    return requests.post("https://idahub.live/api/users", data={"username": str(username), "password": str(password), "email": email}   )
 
 
 URL = "http://localhost"
@@ -71,19 +78,42 @@ def get_response_body_safe(response):
 
 class TestWebAPI(unittest.TestCase):
     def test_create_username_with_same_name(self):
-        username = "test_" + ''.join(random.choice(string.letters) for i in range(4))
+        username = "test" + ''.join(random.choice(string.letters) for i in range(4))
         password = "1234"
-        email = "test_{0}@gm.com".format(username)
-        self.assertEqual(requests.post("https://idahub.live/api/users", data={"username": username, "password": password, "email": email}).status_code, 200)
-        self.assertEqual(requests.post("https://idahub.live/api/users", data={"username": username, "password": password, "email": email}).status_code, 500)
+        self.assertEqual(create_new_user(username, password).status_code, 200)
+        self.assertEqual(create_new_user(username, password).status_code, 500)
 
     def test_create_project_and_search(self):
-        #Ignore this, WIP.
-        project_name = "test_project_" + ''.join(random.choice(string.letters) for i in range(4))
+        project_name = "testProject" + ''.join(random.choice(string.letters) for i in range(4))
         project_desc = "This is desc"
-        project_hash = "123456"
-        requests.post("https://idahub.live/api/users", data={"username": "test_user", "password": "1234", "email": "testMail@gam.com"})
-        token = requests.get("https://idahub.live/api/users", data={"username": "test_user", "password": "1234"}).content
+        project_hash = hashlib.sha256(project_name).hexdigest().upper()
+        create_new_user("testUser", "1234")
+        token = json.loads(requests.get("https://idahub.live/api/users/token", params={"username": "testUser", "password": "1234"}).content)
+        token_value = token["body"]["token"]
+        headers = {"Authorization": "Bearer " + token_value}
+        project_header = {"name": project_name, "description": project_desc, "contributors": [], "public": True, "hash": project_hash}
+        self.assertEqual(requests.post("https://idahub.live/api/projects", json={"project-header": project_header}, headers=headers).status_code, 200)
+        self.assertGreaterEqual(len(json.loads(requests.get("https://idahub.live/api/projects", headers = headers, params="query="+ project_name).content)["body"]["data"]), 1)
+
+    def test_search_for_private_project(self):
+        #Create 2 users, one is the private user, that creates the projects, and one is the public user, that is trying to search for the project.
+        create_new_user("testUserPrivate","1234")
+        create_new_user("testUserPublic","1234")
+        token = json.loads(requests.get("https://idahub.live/api/users/token", params={"username": "testUserPrivate", "password": "1234"}).content)
+        token_value_private = token["body"]["token"]
+        token = json.loads(requests.get("https://idahub.live/api/users/token", params={"username": "testUserPublic", "password": "1234"}).content)
+        token_value_public = token["body"]["token"]
+
+        #Create the private project
+        headers = {"Authorization": "Bearer " + token_value_private}
+        project_name = "PrivateProject" + ''.join(random.choice(string.letters) for i in range(4))
+        project_header = {"name": project_name, "description": "PrivateProject", "contributors": [], "public": False, "hash": hashlib.sha256(project_name).hexdigest()}
+        requests.post("https://idahub.live/api/projects", json={"project-header": project_header}, headers=headers)
+
+        headers = {"Authorization": "Bearer " + token_value_public}
+        self.assertEqual(len(json.loads(requests.get("https://idahub.live/api/projects", headers = headers, params="query="+ project_name).content)["body"]["data"]), 0)
+
+
 
     def test_admin_approval_privilage(self):
         '''
