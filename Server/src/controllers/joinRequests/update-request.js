@@ -13,7 +13,7 @@ const handler = (req, res) => {
     const reqId = req.params['requestId'];
 
     if(!reqId) {
-        sendJSONResponse(res, "Invalid request id", Protocol.Status.NotFoundStatusCode);
+        sendJSONResponse(res, "Invalid request id", false, Protocol.Status.NotFoundStatusCode);
         return;
     }
 
@@ -24,11 +24,11 @@ const handler = (req, res) => {
             return
         }
         if(!request) {
-            sendJSONResponse(res, "Request not found", Protocol.Status.NotFoundStatusCode);
+            sendJSONResponse(res, "Request not found", false, Protocol.Status.NotFoundStatusCode);
             return;
         }
         if(req.jwt.id !== request.ownerId.toString() && req.jwt.id !== request.userId.toString()) {
-            sendJSONResponse(res, "Unauthorized: You are not a party in the request.", Protocol.Status.UnauthorizedStatusCode);
+            sendJSONResponse(res, "Unauthorized: You are not a party in the request.", false, Protocol.Status.UnauthorizedStatusCode);
             return;
         }
         
@@ -56,14 +56,14 @@ const handler = (req, res) => {
         // Only the owner can update whether we read the request, and only the owner can dismiss / approve 
         if(request.readByOwner !== newState.readByOwner || request.approved !== newState.approved || request.dismissed !== newState.dismissed)
             if(req.jwt.id !== request.ownerId.toString()) {
-                sendJSONResponse(res, "Only project owner can change request owner-read status and dismiss / approve status.", Protocol.Status.UnauthorizedStatusCode);
+                sendJSONResponse(res, "Only project owner can change request owner-read status and dismiss / approve status.", false, Protocol.Status.UnauthorizedStatusCode);
                 return;
             }
 
         // Only the requester can update whether he read / seen the approve
         if(request.approveReadByRequester !== newState.approveReadByRequester || request.approveSeenByRequester !== newState.approveSeenByRequester)
             if(req.jwt.id !== request.userId.toString()) {
-                sendJSONResponse(res, "Only request initiator can change requester approve-read status.", Protocol.Status.UnauthorizedStatusCode);
+                sendJSONResponse(res, "Only request initiator can change requester approve-read status.", false, Protocol.Status.UnauthorizedStatusCode);
                 return;
             }
 
