@@ -29,7 +29,7 @@ const handler = (req, res) => {
         }
 
         if(!userToAdd) {
-            sendJSONResponse(res, "User passed to add does not exist", Protocol.Status.NotFoundStatusCode);
+            sendJSONResponse(res, "User passed to add does not exist", false, Protocol.Status.NotFoundStatusCode);
             return;
         }
 
