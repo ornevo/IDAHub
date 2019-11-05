@@ -21,7 +21,7 @@ The `updated-server` branch is the branch containing the code to run on the serv
 
 So, to merge master into it, do the following:
 ```bash
-git pull
+git pull origin master
 git checkout updated-server
 git merge --no-ff --no-commit master
 git reset HEAD Server/bin/www
