@@ -1,0 +1,46 @@
+.NewProjectForm {
+    display: grid;
+    row-gap: 20px;
+}
+
+.NewProjectForm-first-line {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 20px;
+    align-items: center;
+}
+
+.NewProjectForm-hash-inputs-line {
+    display: grid;
+    grid-template-columns: 1fr 100px 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.NewProject-hash-duplicate-alert {
+    background: rgba(253, 202, 64, 0.25);
+    border: 2px solid rgba(253, 202, 64, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#NewProjectForm-automatic-hash-row { height: 100%; }
+
+.NewProjectForm-or-middle-text {
+    text-align: center;
+}
+
+.NewProjectForm-switch-container {
+    text-align: center;
+}
+
+@media (max-width: 720px) {
+    .NewProjectForm,
+    .NewProjectForm-hash-inputs-line,
+    .NewProjectForm-first-line {
+        grid-template-columns: 1fr;
+    }
+    .NewProjectForm-or-middle-text {
+        text-align: left;
+    }
+}
