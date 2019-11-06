@@ -42,9 +42,10 @@ def message_handler(window_handler, msg, wParam, lParam):
 		event_data = json.loads(ctypes.string_at(copy_data.contents.lpData))
 		event_object = create_event_from_dict(event_data)
 		log("Received object: " + str(event_data))
+		prev_hook = shared.PAUSE_HOOK
 		shared.PAUSE_HOOK = True
 		event_object.implement()
-		if not shared.MASTER_PAUSE_HOOK:
+		if not shared.MASTER_PAUSE_HOOK and prev_hook == False:
 			shared.PAUSE_HOOK = False
 	elif wParam == constants.SET_LOGGED_USER:
 		copy_data = ctypes.cast(lParam, constants.PCOPYDATASTRUCT)
