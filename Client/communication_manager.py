@@ -23,6 +23,9 @@ PROJECT_ID = -1
 DEBUG = False
 INTEGRATOR_WINDOW_KEY = ""
 NEED_TO_PULL = True
+#sometimes there is a race condition when the communication manager get the project id and when it get the start evet.
+#so sometimes we need to send it again.
+NEED_TO_SEND_START_AGAIN = False
 
 def create_hidden_window():
 	message_map = {win32con.WM_COPYDATA: message_handler}
@@ -46,7 +49,7 @@ def decode_data(lParam):
 	return data.replace("\x00","")
 
 def message_handler(window_handler, msg, wParam, lParam): 
-	global PROJECT_ID, USERNAME, USERNAME_ID, SECRECT_KEY,BASE_URL, NEED_TO_PULL
+	global PROJECT_ID, USERNAME, USERNAME_ID, SECRECT_KEY,BASE_URL, NEED_TO_PULL, NEED_TO_SEND_START_AGAIN
 	if wParam == SEND_DATA_TO_SERVER:
 		if not NEED_TO_PULL:
 			Thread(target=send_data_to_server, args=(decode_data(lParam), )).start()
@@ -54,6 +57,11 @@ def message_handler(window_handler, msg, wParam, lParam):
 		data = json.loads(decode_data(lParam))
 		PROJECT_ID = data["project-id"]
 		NEED_TO_PULL = data["need-to-pull"]
+		#In case of race condition.
+		if NEED_TO_SEND_START_AGAIN:
+			headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
+			requests.post("{0}/{1}".format(BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+			NEED_TO_SEND_START_AGAIN = False
 	elif wParam == CHANGE_USER:
 		data = json.loads(decode_data(lParam))
 		USERNAME_ID = data["id"]
@@ -62,7 +70,6 @@ def message_handler(window_handler, msg, wParam, lParam):
 	elif wParam == KILL_COMMUNICATION_MANAGER_MESSAGE_ID:
 		headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
 		requests.post("{0}/{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
-		print "Kill start"
 		kill()
 	elif wParam == CHANGE_BASE_URL:
 		data = json.loads(decode_data(lParam))
@@ -71,22 +78,30 @@ def message_handler(window_handler, msg, wParam, lParam):
 		pull_from_server(INTEGRATOR_WINDOW_KEY, True)
 
 def send_data_to_server(data):
-	if PROJECT_ID == -1 or SECRECT_KEY == "":
-		return -1
+	global NEED_TO_SEND_START_AGAIN
 	data_to_send_json = json.loads(data)
 	data = data_to_send_json["data"]
 	data_to_send_json.pop("data")
 	data_to_send_json.update(data)
 	data_to_send_json["projectId"] = PROJECT_ID
-	print data_to_send_json
+	if PROJECT_ID == -1 or SECRECT_KEY == "":
+		if data_to_send_json["event-id"] == START_IDA_ID:
+			NEED_TO_SEND_START_AGAIN = True
+		return -1
 	
 	headers = {"Authorization" : "Bearer {0}".format(SECRECT_KEY)}
 	if data_to_send_json["event-id"] == START_IDA_ID:
+		if PROJECT_ID != -1:
 			requests.post("{0}/{1}".format(BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+		else:
+			NEED_TO_SEND_START_AGAIN = True
 	elif data_to_send_json["event-id"] == EXIT_FROM_IDA_ID:
-			requests.post("{0}/{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+		requests.post("{0}/{1}".format(BASE_URL, END_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
 	else:
-			requests.post("{0}/{1}".format(BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data_to_send_json, headers=headers, timeout=5)
+		if NEED_TO_SEND_START_AGAIN:
+			requests.post("{0}/{1}".format(BASE_URL, START_SESSION.format(PROJECT_ID)), headers=headers, timeout=5)
+			NEED_TO_SEND_START_AGAIN = False
+		requests.post("{0}/{1}".format(BASE_URL, PUSH_DATA_TO_PROJECT.format(PROJECT_ID)), data=data_to_send_json, headers=headers, timeout=5)
 
 def get_last_update_time_from_config():
 	with open(PROJECT_DATA_FILE, 'r') as f:
