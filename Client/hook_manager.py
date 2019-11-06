@@ -54,6 +54,8 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 
 	def	ev_newfile(self, fname):	
 		log("START")
+		#in case of race condition
+		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID,"need-to-pull": shared.MASTER_PAUSE_HOOK}))
 		pass_to_manager(StartIDAEvent())
 		if not shared.MASTER_PAUSE_HOOK:
 			shared.PAUSE_HOOK = not ida_auto.auto_is_ok()
@@ -61,6 +63,8 @@ class LiveHookIDP(ida_idp.IDP_Hooks):
 
 	def ev_oldfile(self, fname):
 		log("START")
+		#in case of race condition
+		constants.send_data_to_window(shared.COMMUNICATION_MANAGER_WINDOW_ID, constants.CHANGE_PROJECT_ID, json.dumps({"project-id": shared.PROJECT_ID,"need-to-pull": shared.MASTER_PAUSE_HOOK}))
 		pass_to_manager(StartIDAEvent())
 		if not shared.MASTER_PAUSE_HOOK:
 			shared.PAUSE_HOOK = not ida_auto.auto_is_ok()
